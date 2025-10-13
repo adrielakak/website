@@ -22,6 +22,10 @@ export interface ReservationRecord {
 
 const RESERVATIONS_PATH = resolveDataPath("reservations.json");
 const ACTIVE_STATUSES: ReservationStatus[] = ["stripe_pending", "stripe_confirmed", "virement_en_attente"];
+const PENDING_TIMEOUT_MINUTES = Number.parseFloat(process.env.STRIPE_PENDING_TIMEOUT_MINUTES ?? "5");
+const PENDING_TIMEOUT_MS = Number.isFinite(PENDING_TIMEOUT_MINUTES) && PENDING_TIMEOUT_MINUTES > 0
+  ? PENDING_TIMEOUT_MINUTES * 60 * 1000
+  : 5 * 60 * 1000;
 
 async function ensureStorage(): Promise<void> {
   const exists = await fs.pathExists(RESERVATIONS_PATH);
@@ -36,11 +40,37 @@ export async function readReservations(): Promise<ReservationRecord[]> {
   if (!raw.trim()) {
     return [];
   }
-  return JSON.parse(raw) as ReservationRecord[];
+  const reservations = JSON.parse(raw) as ReservationRecord[];
+  return await applyPendingTimeout(reservations);
 }
 
 async function writeReservations(reservations: ReservationRecord[]): Promise<void> {
   await fs.outputJson(RESERVATIONS_PATH, reservations, { spaces: 2 });
+}
+
+async function applyPendingTimeout(reservations: ReservationRecord[]): Promise<ReservationRecord[]> {
+  const now = Date.now();
+  let changed = false;
+
+  const updated = reservations.map((reservation) => {
+    if (reservation.status === "stripe_pending") {
+      const createdTime = new Date(reservation.createdAt).getTime();
+      if (Number.isFinite(createdTime) && now - createdTime >= PENDING_TIMEOUT_MS) {
+        changed = true;
+        return {
+          ...reservation,
+          status: "cancelled",
+        };
+      }
+    }
+    return reservation;
+  });
+
+  if (changed) {
+    await writeReservations(updated);
+  }
+
+  return updated;
 }
 
 interface ReservationInput {

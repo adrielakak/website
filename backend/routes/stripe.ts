@@ -52,6 +52,11 @@ function resolveLineItems(
   ];
 }
 
+function resolveClientBaseUrl(): string {
+  const raw = process.env.CLIENT_URL ?? "http://localhost:5173";
+  return raw.trim().replace(/\/+$/, "");
+}
+
 router.post("/create-checkout-session", async (req, res) => {
   const { customerName, customerEmail, formationId, sessionId } = req.body ?? {};
 
@@ -99,7 +104,7 @@ router.post("/create-checkout-session", async (req, res) => {
   };
 
   try {
-    const successBase = process.env.CLIENT_URL ?? "http://localhost:5173";
+    const successBase = resolveClientBaseUrl();
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: customerEmail,
