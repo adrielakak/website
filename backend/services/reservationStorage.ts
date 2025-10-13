@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import fs from "fs-extra";
-import path from "path";
+
+import { resolveDataPath } from "./storagePaths.js";
 
 export type PaymentMethod = "stripe" | "virement";
 export type ReservationStatus = "stripe_pending" | "stripe_confirmed" | "virement_en_attente" | "cancelled";
@@ -19,7 +20,9 @@ export interface ReservationRecord {
   createdAt: string;
 }
 
-const RESERVATIONS_PATH = path.resolve(process.cwd(), "data", "reservations.json");
+import { resolveDataPath } from "./storagePaths.js";
+
+const RESERVATIONS_PATH = resolveDataPath("reservations.json");
 const ACTIVE_STATUSES: ReservationStatus[] = ["stripe_pending", "stripe_confirmed", "virement_en_attente"];
 
 async function ensureStorage(): Promise<void> {

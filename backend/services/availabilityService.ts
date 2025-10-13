@@ -1,7 +1,7 @@
 import fs from "fs-extra";
-import path from "path";
 
 import type { Formation } from "../data/formations.js";
+import { resolveDataPath } from "./storagePaths.js";
 
 export interface SessionAvailability {
   sessionId: string;
@@ -12,7 +12,7 @@ export interface SessionAvailability {
 type AvailabilityState = Record<string, SessionAvailability>;
 
 const DEFAULT_CAPACITY = Number(process.env.DEFAULT_SESSION_CAPACITY ?? 12);
-const AVAILABILITY_PATH = path.resolve(process.cwd(), "data", "availability.json");
+const AVAILABILITY_PATH = resolveDataPath("availability.json");
 
 async function ensureStorage(): Promise<void> {
   const exists = await fs.pathExists(AVAILABILITY_PATH);

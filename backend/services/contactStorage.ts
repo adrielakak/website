@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import fs from "fs-extra";
-import path from "path";
+
+import { resolveDataPath } from "./storagePaths.js";
 
 export interface ContactMessage {
   id: string;
@@ -10,7 +11,7 @@ export interface ContactMessage {
   createdAt: string;
 }
 
-const CONTACT_PATH = path.resolve(process.cwd(), "data", "contactMessages.json");
+const CONTACT_PATH = resolveDataPath("contactMessages.json");
 
 async function ensureContactStorage(): Promise<void> {
   const exists = await fs.pathExists(CONTACT_PATH);
