@@ -1,0 +1,127 @@
+import fs from "fs-extra";
+import path from "path";
+
+import type { Formation } from "../data/formations.js";
+
+export interface SessionAvailability {
+  sessionId: string;
+  capacity: number;
+  isOpen: boolean;
+}
+
+type AvailabilityState = Record<string, SessionAvailability>;
+
+const DEFAULT_CAPACITY = Number(process.env.DEFAULT_SESSION_CAPACITY ?? 12);
+const AVAILABILITY_PATH = path.resolve(process.cwd(), "data", "availability.json");
+
+async function ensureStorage(): Promise<void> {
+  const exists = await fs.pathExists(AVAILABILITY_PATH);
+  if (!exists) {
+    await fs.outputJson(AVAILABILITY_PATH, {}, { spaces: 2 });
+  }
+}
+
+export async function readAvailabilityState(): Promise<AvailabilityState> {
+  await ensureStorage();
+  const raw = await fs.readFile(AVAILABILITY_PATH, "utf-8");
+  if (!raw.trim()) {
+    return {};
+  }
+  return JSON.parse(raw) as AvailabilityState;
+}
+
+async function writeAvailabilityState(state: AvailabilityState): Promise<void> {
+  await fs.outputJson(AVAILABILITY_PATH, state, { spaces: 2 });
+}
+
+export async function ensureAvailabilityDefaults(formations: Formation[]): Promise<void> {
+  const state = await readAvailabilityState();
+  let changed = false;
+
+  for (const formation of formations) {
+    for (const session of formation.sessions) {
+      if (!state[session.id]) {
+        state[session.id] = {
+          sessionId: session.id,
+          capacity: DEFAULT_CAPACITY,
+          isOpen: true,
+        };
+        changed = true;
+      }
+    }
+  }
+
+  const knownSessionIds = new Set(
+    formations.flatMap((formation) => formation.sessions.map((session) => session.id))
+  );
+
+  for (const sessionId of Object.keys(state)) {
+    if (!knownSessionIds.has(sessionId)) {
+      delete state[sessionId];
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    await writeAvailabilityState(state);
+  }
+}
+
+export async function getSessionAvailability(sessionId: string): Promise<SessionAvailability> {
+  const state = await readAvailabilityState();
+  return (
+    state[sessionId] ?? {
+      sessionId,
+      capacity: DEFAULT_CAPACITY,
+      isOpen: true,
+    }
+  );
+}
+
+export async function upsertSessionAvailability(
+  sessionId: string,
+  updates: Partial<Pick<SessionAvailability, "capacity" | "isOpen">>
+): Promise<SessionAvailability> {
+  const state = await readAvailabilityState();
+  const current = state[sessionId] ?? {
+    sessionId,
+    capacity: DEFAULT_CAPACITY,
+    isOpen: true,
+  };
+  const next: SessionAvailability = {
+    ...current,
+    ...updates,
+    capacity:
+      typeof updates.capacity === "number" && updates.capacity >= 0 ? Math.floor(updates.capacity) : current.capacity,
+  };
+  state[sessionId] = next;
+  await writeAvailabilityState(state);
+  return next;
+}
+
+export async function getAvailabilityList(formations: Formation[]): Promise<
+  Array<
+    {
+      formationId: string;
+      formationTitle: string;
+      sessionId: string;
+      sessionLabel: string;
+      startDate: string;
+      endDate: string;
+    } & SessionAvailability
+  >
+> {
+  const state = await readAvailabilityState();
+  return formations.flatMap((formation) =>
+    formation.sessions.map((session) => ({
+      formationId: formation.id,
+      formationTitle: formation.title,
+      sessionId: session.id,
+      sessionLabel: session.label,
+      startDate: session.startDate,
+      endDate: session.endDate,
+      capacity: state[session.id]?.capacity ?? DEFAULT_CAPACITY,
+      isOpen: state[session.id]?.isOpen ?? true,
+    }))
+  );
+}

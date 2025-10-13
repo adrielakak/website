@@ -1,0 +1,110 @@
+import { randomUUID } from "crypto";
+import fs from "fs-extra";
+import path from "path";
+
+export type PaymentMethod = "stripe" | "virement";
+export type ReservationStatus = "stripe_pending" | "stripe_confirmed" | "virement_en_attente" | "cancelled";
+
+export interface ReservationRecord {
+  id: string;
+  formationId: string;
+  formationTitle: string;
+  sessionId: string;
+  sessionLabel: string;
+  customerName: string;
+  customerEmail: string;
+  paymentMethod: PaymentMethod;
+  status: ReservationStatus;
+  stripeSessionId?: string;
+  createdAt: string;
+}
+
+const RESERVATIONS_PATH = path.resolve(process.cwd(), "data", "reservations.json");
+const ACTIVE_STATUSES: ReservationStatus[] = ["stripe_pending", "stripe_confirmed", "virement_en_attente"];
+
+async function ensureStorage(): Promise<void> {
+  const exists = await fs.pathExists(RESERVATIONS_PATH);
+  if (!exists) {
+    await fs.outputJson(RESERVATIONS_PATH, [], { spaces: 2 });
+  }
+}
+
+export async function readReservations(): Promise<ReservationRecord[]> {
+  await ensureStorage();
+  const raw = await fs.readFile(RESERVATIONS_PATH, "utf-8");
+  if (!raw.trim()) {
+    return [];
+  }
+  return JSON.parse(raw) as ReservationRecord[];
+}
+
+async function writeReservations(reservations: ReservationRecord[]): Promise<void> {
+  await fs.outputJson(RESERVATIONS_PATH, reservations, { spaces: 2 });
+}
+
+interface ReservationInput {
+  formationId: string;
+  formationTitle: string;
+  sessionId: string;
+  sessionLabel: string;
+  customerName: string;
+  customerEmail: string;
+  paymentMethod: PaymentMethod;
+  status: ReservationStatus;
+  stripeSessionId?: string;
+}
+
+export async function addReservation(input: ReservationInput): Promise<ReservationRecord> {
+  const reservations = await readReservations();
+  const record: ReservationRecord = {
+    id: randomUUID(),
+    createdAt: new Date().toISOString(),
+    ...input,
+  };
+  reservations.push(record);
+  await writeReservations(reservations);
+  return record;
+}
+
+export async function countActiveReservationsBySession(sessionId: string): Promise<number> {
+  const reservations = await readReservations();
+  return reservations.filter(
+    (reservation) => reservation.sessionId === sessionId && ACTIVE_STATUSES.includes(reservation.status)
+  ).length;
+}
+
+interface ReservationUpdate {
+  status?: ReservationStatus;
+  stripeSessionId?: string;
+}
+
+export async function updateReservationByStripeSession(
+  stripeSessionId: string,
+  updates: ReservationUpdate
+): Promise<ReservationRecord | null> {
+  if (!stripeSessionId) {
+    return null;
+  }
+
+  const reservations = await readReservations();
+  const index = reservations.findIndex((reservation) => reservation.stripeSessionId === stripeSessionId);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const current = reservations[index];
+  const next: ReservationRecord = {
+    ...current,
+    ...updates,
+  };
+
+  reservations[index] = next;
+  await writeReservations(reservations);
+  return next;
+}
+
+export async function listReservations(): Promise<ReservationRecord[]> {
+  const reservations = await readReservations();
+  return reservations.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}

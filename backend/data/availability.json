@@ -1,0 +1,39 @@
+{
+  "stage-2025-01-24": {
+    "sessionId": "stage-2025-01-24",
+    "capacity": 20
+  },
+  "stage-2025-02-07": {
+    "sessionId": "stage-2025-02-07",
+    "capacity": 10
+  },
+  "stage-2025-03-14": {
+    "sessionId": "stage-2025-03-14",
+    "capacity": 12,
+    "isOpen": true
+  },
+  "stage-2025-03-28": {
+    "sessionId": "stage-2025-03-28",
+    "capacity": 12,
+    "isOpen": true
+  },
+  "stage-2025-06-06": {
+    "sessionId": "stage-2025-06-06",
+    "capacity": 12,
+    "isOpen": true
+  },
+  "stage-2025-06-27": {
+    "sessionId": "stage-2025-06-27",
+    "capacity": 20
+  },
+  "stage-2025-07-18": {
+    "sessionId": "stage-2025-07-18",
+    "capacity": 12,
+    "isOpen": true
+  },
+  "stage-2025-08-08": {
+    "sessionId": "stage-2025-08-08",
+    "capacity": 12,
+    "isOpen": true
+  }
+}

@@ -1,0 +1,32 @@
+import { Router } from "express";
+import { formations } from "../data/formations.js";
+import { getAvailabilityList } from "../services/availabilityService.js";
+import { readReservations } from "../services/reservationStorage.js";
+const router = Router();
+router.get("/", async (_req, res) => {
+    try {
+        const [availability, reservations] = await Promise.all([getAvailabilityList(formations), readReservations()]);
+        const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente"]);
+        const sessions = availability.map((item) => {
+            const reservedCount = reservations.filter((reservation) => reservation.sessionId === item.sessionId && activeStatuses.has(reservation.status)).length;
+            return {
+                formationId: item.formationId,
+                formationTitle: item.formationTitle,
+                sessionId: item.sessionId,
+                sessionLabel: item.sessionLabel,
+                startDate: item.startDate,
+                endDate: item.endDate,
+                capacity: item.capacity,
+                isOpen: item.isOpen,
+                reservedCount,
+                remaining: Math.max(item.capacity - reservedCount, 0),
+            };
+        });
+        res.json({ sessions });
+    }
+    catch (error) {
+        console.error("Erreur de récupération des disponibilités:", error);
+        res.status(500).json({ message: "Impossible de récupérer les disponibilités pour le moment." });
+    }
+});
+export default router;
