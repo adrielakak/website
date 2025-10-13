@@ -10,7 +10,7 @@ import {
   readReservations,
   ReservationRecord,
 } from "../services/reservationStorage.js";
-import { listContactMessages } from "../services/contactStorage.js";
+import { deleteContactMessage, listContactMessages, updateContactMessageStatus } from "../services/contactStorage.js";
 
 const router = Router();
 
@@ -117,6 +117,41 @@ router.get("/contact", async (_req, res) => {
   } catch (error) {
     console.error("Erreur admin/contact:", error);
     res.status(500).json({ message: "Impossible de récupérer les messages de contact." });
+  }
+});
+
+router.patch("/contact/:id", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body ?? {};
+
+  if (!status || !["new", "handled"].includes(status)) {
+    return res.status(400).json({ message: "Statut invalide." });
+  }
+
+  try {
+    const updated = await updateContactMessageStatus(id, status);
+    if (!updated) {
+      return res.status(404).json({ message: "Message introuvable." });
+    }
+    res.json(updated);
+  } catch (error) {
+    console.error("Erreur admin/contact:update:", error);
+    res.status(500).json({ message: "Impossible de mettre à jour le message." });
+  }
+});
+
+router.delete("/contact/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deleted = await deleteContactMessage(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Message introuvable." });
+    }
+    res.status(204).send();
+  } catch (error) {
+    console.error("Erreur admin/contact:delete:", error);
+    res.status(500).json({ message: "Impossible de supprimer le message." });
   }
 });
 

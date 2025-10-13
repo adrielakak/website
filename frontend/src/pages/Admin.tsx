@@ -19,6 +19,7 @@ interface AdminReservation {
   id: string;
   formationTitle: string;
   sessionLabel: string;
+  sessionId: string;
   customerName: string;
   customerEmail: string;
   paymentMethod: "stripe" | "virement";
@@ -33,6 +34,7 @@ interface AdminContactMessage {
   email: string;
   message: string;
   createdAt: string;
+  status: "new" | "handled";
 }
 
 function Admin() {
@@ -109,6 +111,60 @@ function Admin() {
       setSavingSessionId(null);
     }
   };
+
+  const handleContactStatusChange = async (id: string, status: AdminContactMessage["status"]) => {
+    if (!adminKey) {
+      return;
+    }
+    try {
+      await apiClient.patch(
+        `/api/admin/contact/${id}`,
+        { status },
+        { headers: { "x-admin-key": adminKey } }
+      );
+      await fetchDashboard(adminKey);
+    } catch (error) {
+      console.error("Erreur mise à jour message:", error);
+      setErrorMessage("Impossible de mettre à jour le message. Réessayez plus tard.");
+    }
+  };
+
+  const handleContactDelete = async (id: string) => {
+    if (!adminKey) {
+      return;
+    }
+    const confirmation = window.confirm("Supprimer définitivement ce message ?");
+    if (!confirmation) {
+      return;
+    }
+    try {
+      await apiClient.delete(`/api/admin/contact/${id}`, {
+        headers: { "x-admin-key": adminKey },
+      });
+      await fetchDashboard(adminKey);
+    } catch (error) {
+      console.error("Erreur suppression message:", error);
+      setErrorMessage("Impossible de supprimer le message.");
+    }
+  };
+
+  const sessionsWithParticipants = useMemo(() => {
+    const participantsBySession = reservations.reduce<Record<string, AdminReservation[]>>((acc, reservation) => {
+      acc[reservation.sessionId] = acc[reservation.sessionId] ?? [];
+      acc[reservation.sessionId].push(reservation);
+      return acc;
+    }, {});
+
+    return availability.map((session) => {
+      const participants = participantsBySession[session.sessionId] ?? [];
+      const percent = session.capacity === 0 ? 0 : Math.min(100, Math.round((session.reservedCount / session.capacity) * 100));
+      return {
+        ...session,
+        participants,
+        percent,
+      };
+    });
+  }, [availability, reservations]);
 
   if (!adminKey) {
     return (
@@ -250,6 +306,57 @@ function Admin() {
         </section>
 
         <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
+          <h2 className="text-2xl font-semibold">Remplissage des sessions</h2>
+          <p className="mt-2 text-sm text-white/65">
+            Visualisez l&apos;occupation de chaque session et les participants déjà inscrits.
+          </p>
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            {sessionsWithParticipants.map((session) => (
+              <div key={session.sessionId} className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-brand-gold/80">{session.sessionLabel}</p>
+                    <h3 className="mt-1 text-lg font-semibold text-white">{session.formationTitle}</h3>
+                    <p className="text-xs text-white/50">
+                      {session.reservedCount}/{session.capacity} places • {session.percent}% rempli
+                    </p>
+                  </div>
+                  <div className="h-16 w-16 rounded-full border-2 border-brand-primary/40 bg-brand-primary/10 text-center text-sm font-semibold text-brand-gold flex items-center justify-center">
+                    {session.percent}%
+                  </div>
+                </div>
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-brand-primary to-brand-gold"
+                    style={{ width: `${session.percent}%` }}
+                  />
+                </div>
+                <div className="mt-4 space-y-2 text-sm text-white/70">
+                  {session.participants.length === 0 ? (
+                    <p className="text-xs text-white/50">Aucun participant pour le moment.</p>
+                  ) : (
+                    session.participants.map((participant) => (
+                      <div key={participant.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2">
+                        <div>
+                          <p className="font-semibold text-white">{participant.customerName}</p>
+                          <p className="text-xs text-white/50">{participant.customerEmail}</p>
+                        </div>
+                        <span className="text-xs uppercase tracking-[0.3em] text-white/50">
+                          {participant.paymentMethod === "stripe" ? "Stripe" : "Virement"}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            ))}
+            {sessionsWithParticipants.length === 0 && !isLoading && (
+              <p className="text-sm text-white/60">Aucune session planifiée.</p>
+            )}
+          </div>
+        </section>
+
+        <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
           <h2 className="text-2xl font-semibold">Réservations en temps réel</h2>
           <p className="mt-2 text-sm text-white/65">
             Historique des paiements Stripe et demandes de virement. La colonne statut vous aide à suivre ce qu&apos;il reste à valider.
@@ -322,13 +429,50 @@ function Admin() {
                       {message.email}
                     </a>
                   </div>
-                  <span className="text-xs uppercase tracking-[0.3em] text-white/50">
-                    {dateFormatter.format(new Date(message.createdAt))}
-                  </span>
+                  <div className="flex flex-col items-end gap-2 text-xs">
+                    <span className="uppercase tracking-[0.3em] text-white/50">
+                      {dateFormatter.format(new Date(message.createdAt))}
+                    </span>
+                    <span
+                      className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold ${
+                        message.status === "handled"
+                          ? "bg-emerald-400/15 text-emerald-200"
+                          : "bg-amber-400/15 text-amber-200"
+                      }`}
+                    >
+                      {message.status === "handled" ? "Traité" : "Nouveau"}
+                    </span>
+                  </div>
                 </div>
                 <p className="mt-4 whitespace-pre-line rounded-xl border border-white/5 bg-white/[0.02] p-4 text-sm text-white/80">
                   {message.message}
                 </p>
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  {message.status === "handled" ? (
+                    <button
+                      type="button"
+                      className="btn-secondary text-xs uppercase tracking-[0.3em]"
+                      onClick={() => handleContactStatusChange(message.id, "new")}
+                    >
+                      Marquer comme à traiter
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn-primary text-xs uppercase tracking-[0.3em]"
+                      onClick={() => handleContactStatusChange(message.id, "handled")}
+                    >
+                      Marquer comme traité
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="rounded-full border border-red-500/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-red-200 transition hover:bg-red-500/10"
+                    onClick={() => handleContactDelete(message.id)}
+                  >
+                    Supprimer
+                  </button>
+                </div>
               </div>
             ))}
             {contactMessages.length === 0 && !isLoading && (
