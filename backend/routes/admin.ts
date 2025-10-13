@@ -10,6 +10,7 @@ import {
   readReservations,
   ReservationRecord,
 } from "../services/reservationStorage.js";
+import { listContactMessages } from "../services/contactStorage.js";
 
 const router = Router();
 
@@ -106,6 +107,16 @@ router.get("/reservations", async (_req, res) => {
   } catch (error) {
     console.error("Erreur admin/reservations:", error);
     res.status(500).json({ message: "Impossible de lister les réservations." });
+  }
+});
+
+router.get("/contact", async (_req, res) => {
+  try {
+    const messages = await listContactMessages();
+    res.json({ messages });
+  } catch (error) {
+    console.error("Erreur admin/contact:", error);
+    res.status(500).json({ message: "Impossible de récupérer les messages de contact." });
   }
 });
 

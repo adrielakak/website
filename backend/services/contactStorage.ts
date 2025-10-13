@@ -36,3 +36,10 @@ export async function addContactMessage(data: Omit<ContactMessage, "id" | "creat
 
   return record;
 }
+
+export async function listContactMessages(): Promise<ContactMessage[]> {
+  await ensureContactStorage();
+  const existingRaw = await fs.readFile(CONTACT_PATH, "utf-8");
+  const messages: ContactMessage[] = existingRaw.trim() ? JSON.parse(existingRaw) : [];
+  return messages.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}

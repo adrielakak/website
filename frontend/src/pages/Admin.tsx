@@ -27,11 +27,20 @@ interface AdminReservation {
   createdAt: string;
 }
 
+interface AdminContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: string;
+}
+
 function Admin() {
   const [adminKeyInput, setAdminKeyInput] = useState("");
   const [adminKey, setAdminKey] = useState<string | null>(null);
   const [availability, setAvailability] = useState<AdminAvailabilityItem[]>([]);
   const [reservations, setReservations] = useState<AdminReservation[]>([]);
+  const [contactMessages, setContactMessages] = useState<AdminContactMessage[]>([]);
   const [capacityDrafts, setCapacityDrafts] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -42,11 +51,14 @@ function Admin() {
   const fetchDashboard = async (key: string) => {
     try {
       setIsLoading(true);
-      const [availabilityResponse, reservationsResponse] = await Promise.all([
+      const [availabilityResponse, reservationsResponse, contactResponse] = await Promise.all([
         apiClient.get<{ sessions: AdminAvailabilityItem[] }>("/api/admin/availability", {
           headers: { "x-admin-key": key },
         }),
         apiClient.get<{ reservations: AdminReservation[] }>("/api/admin/reservations", {
+          headers: { "x-admin-key": key },
+        }),
+        apiClient.get<{ messages: AdminContactMessage[] }>("/api/admin/contact", {
           headers: { "x-admin-key": key },
         }),
       ]);
@@ -59,6 +71,7 @@ function Admin() {
         }, {})
       );
       setReservations(reservationsResponse.data.reservations);
+      setContactMessages(contactResponse.data.messages);
       setAdminKey(key);
       setErrorMessage(null);
     } catch (error) {
@@ -290,6 +303,36 @@ function Admin() {
             </table>
             {reservations.length === 0 && !isLoading && (
               <p className="mt-6 text-sm text-white/60">Aucune réservation enregistrée pour le moment.</p>
+            )}
+          </div>
+        </section>
+
+        <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
+          <h2 className="text-2xl font-semibold">Messages de contact</h2>
+          <p className="mt-2 text-sm text-white/65">
+            Suivez les demandes envoyées depuis le formulaire de contact. Pensez à répondre rapidement pour confirmer la prise en charge.
+          </p>
+          <div className="mt-6 space-y-4">
+            {contactMessages.map((message) => (
+              <div key={message.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-lg font-semibold text-white">{message.name}</p>
+                    <a className="text-sm text-brand-gold hover:underline" href={`mailto:${message.email}`}>
+                      {message.email}
+                    </a>
+                  </div>
+                  <span className="text-xs uppercase tracking-[0.3em] text-white/50">
+                    {dateFormatter.format(new Date(message.createdAt))}
+                  </span>
+                </div>
+                <p className="mt-4 whitespace-pre-line rounded-xl border border-white/5 bg-white/[0.02] p-4 text-sm text-white/80">
+                  {message.message}
+                </p>
+              </div>
+            ))}
+            {contactMessages.length === 0 && !isLoading && (
+              <p className="text-sm text-white/60">Aucun message reçu pour le moment.</p>
             )}
           </div>
         </section>
