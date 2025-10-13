@@ -24,9 +24,26 @@ const app = express();
 const PORT = Number(process.env.PORT ?? 4000);
 const DEFAULT_IBAN = process.env.BANK_IBAN ?? "FR76 XXXX XXXX XXXX XXXX XXXX X";
 
+const rawOrigins = process.env.CLIENT_URLS ?? process.env.CLIENT_URL ?? "*";
+const allowedOrigins = rawOrigins
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter((origin) => origin.length > 0);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL ?? "*",
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
   })
 );
 
