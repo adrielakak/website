@@ -1,14 +1,23 @@
 import axios from "axios";
 
-// Détection automatique : production (Render) ou développement local
-const isProduction = import.meta.env.MODE === "production";
+function resolveApiBaseUrl(): string {
+  const configured = import.meta.env.VITE_API_URL;
+  if (configured && configured.trim().length > 0) {
+    return configured.trim();
+  }
 
-// Base URL selon l'environnement
-const API_BASE_URL = isProduction
-  ? import.meta.env.VITE_API_URL // Render / en ligne
-  : "http://localhost:4000";     // en local
+  if (typeof window !== "undefined") {
+    const { origin, hostname } = window.location;
+    if (hostname.endsWith(".onrender.com")) {
+      return origin.replace(hostname, "nathalie-bkuv.onrender.com");
+    }
+  }
 
-// Configuration Axios
+  return "http://localhost:4000";
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
+
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -17,5 +26,4 @@ export const apiClient = axios.create({
   timeout: 10000,
 });
 
-// Export utile pour debug si besoin
 export { API_BASE_URL };
