@@ -1,19 +1,22 @@
 import axios from "axios";
 
+const DEFAULT_RENDER_API = "https://nathalie-bkuv.onrender.com";
+
 function resolveApiBaseUrl(): string {
-  const configured = import.meta.env.VITE_API_URL;
-  if (configured && configured.trim().length > 0) {
-    return configured.trim();
+  const configured = import.meta.env.VITE_API_URL?.trim();
+  if (configured) {
+    return configured;
   }
 
-  if (typeof window !== "undefined") {
-    const { origin, hostname } = window.location;
-    if (hostname.endsWith(".onrender.com")) {
-      return origin.replace(hostname, "nathalie-bkuv.onrender.com");
-    }
+  if (import.meta.env.MODE === "production") {
+    return DEFAULT_RENDER_API;
   }
 
-  return "http://localhost:4000";
+  if (import.meta.env.DEV) {
+    return "http://localhost:4000";
+  }
+
+  return DEFAULT_RENDER_API;
 }
 
 const API_BASE_URL = resolveApiBaseUrl();
