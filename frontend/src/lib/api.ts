@@ -1,7 +1,14 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+// Détection automatique : production (Render) ou développement local
+const isProduction = import.meta.env.MODE === "production";
 
+// Base URL selon l'environnement
+const API_BASE_URL = isProduction
+  ? import.meta.env.VITE_API_URL // Render / en ligne
+  : "http://localhost:4000";     // en local
+
+// Configuration Axios
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -10,4 +17,5 @@ export const apiClient = axios.create({
   timeout: 10000,
 });
 
+// Export utile pour debug si besoin
 export { API_BASE_URL };
