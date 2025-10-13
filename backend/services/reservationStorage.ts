@@ -20,8 +20,6 @@ export interface ReservationRecord {
   createdAt: string;
 }
 
-import { resolveDataPath } from "./storagePaths.js";
-
 const RESERVATIONS_PATH = resolveDataPath("reservations.json");
 const ACTIVE_STATUSES: ReservationStatus[] = ["stripe_pending", "stripe_confirmed", "virement_en_attente"];
 
