@@ -59,7 +59,7 @@ async function applyPendingTimeout(reservations: ReservationRecord[]): Promise<R
         changed = true;
         return {
           ...reservation,
-          status: "cancelled",
+          status: "cancelled" as ReservationStatus,
         };
       }
     }
