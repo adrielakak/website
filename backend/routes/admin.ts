@@ -3,12 +3,19 @@ import { NextFunction, Request, Response, Router } from "express";
 import { formations } from "../data/formations.js";
 import {
   getAvailabilityList,
+  getSessionAvailability,
+  SessionAvailability,
   upsertSessionAvailability,
 } from "../services/availabilityService.js";
 import {
+  countActiveReservationsBySession,
+  findReservationById,
   listReservations,
   readReservations,
   ReservationRecord,
+  ReservationStatus,
+  ReservationUpdate,
+  updateReservationById,
 } from "../services/reservationStorage.js";
 import { deleteContactMessage, listContactMessages, updateContactMessageStatus } from "../services/contactStorage.js";
 
@@ -53,9 +60,10 @@ router.get("/availability", async (_req, res) => {
         startDate: item.startDate,
         endDate: item.endDate,
         capacity: item.capacity,
-        isOpen: item.isOpen,
+        isOpen: item.isOpen && !item.isCancelled,
+        isCancelled: item.isCancelled,
         reservedCount,
-        remaining: Math.max(item.capacity - reservedCount, 0),
+        remaining: item.isCancelled ? 0 : Math.max(item.capacity - reservedCount, 0),
       };
     });
 
@@ -68,7 +76,7 @@ router.get("/availability", async (_req, res) => {
 
 router.put("/availability/:sessionId", async (req, res) => {
   const { sessionId } = req.params;
-  const { capacity, isOpen } = req.body ?? {};
+  const { capacity, isOpen, isCancelled } = req.body ?? {};
 
   if (capacity !== undefined && (typeof capacity !== "number" || Number.isNaN(capacity) || capacity < 0)) {
     return res.status(400).json({ message: "La capacité doit être un nombre positif." });
@@ -78,21 +86,104 @@ router.put("/availability/:sessionId", async (req, res) => {
     return res.status(400).json({ message: "isOpen doit être un booléen." });
   }
 
+  if (isCancelled !== undefined && typeof isCancelled !== "boolean") {
+    return res.status(400).json({ message: "isCancelled doit être un booléen." });
+  }
+
   try {
     const formation = formations.find((form) => form.sessions.some((session) => session.id === sessionId));
     if (!formation) {
       return res.status(404).json({ message: "Session introuvable." });
     }
 
-    const updated = await upsertSessionAvailability(sessionId, {
-      capacity,
-      isOpen,
-    });
+    const updates: Partial<Pick<SessionAvailability, "capacity" | "isOpen" | "isCancelled">> = {};
+    if (capacity !== undefined) {
+      updates.capacity = capacity;
+    }
+    if (isOpen !== undefined) {
+      updates.isOpen = isOpen;
+    }
+    if (isCancelled !== undefined) {
+      updates.isCancelled = isCancelled;
+      if (isCancelled) {
+        updates.isOpen = false;
+      }
+    }
+
+    const updated = await upsertSessionAvailability(sessionId, updates);
 
     res.json(updated);
   } catch (error) {
     console.error("Erreur admin/update availability:", error);
     res.status(500).json({ message: "Impossible de mettre à jour la disponibilité." });
+  }
+});
+
+router.patch("/reservations/:id", async (req, res) => {
+  const { id } = req.params;
+  const { sessionId, status } = req.body ?? {};
+
+  if (!sessionId && !status) {
+    return res.status(400).json({ message: "Aucune mise à jour demandée." });
+  }
+
+  try {
+    const reservation = await findReservationById(id);
+    if (!reservation) {
+      return res.status(404).json({ message: "Réservation introuvable." });
+    }
+
+    const updates: ReservationUpdate = {};
+
+    if (sessionId) {
+      const formation = formations.find((form) => form.id === reservation.formationId);
+      if (!formation) {
+        return res.status(404).json({ message: "Formation associée introuvable." });
+      }
+
+      const sessionOption = formation.sessions.find((session) => session.id === sessionId);
+      if (!sessionOption) {
+        return res.status(404).json({ message: "Session introuvable pour cette formation." });
+      }
+
+      const availability = await getSessionAvailability(sessionId);
+      if (availability.isCancelled) {
+        return res
+          .status(409)
+          .json({ message: "Cette session est annulée : impossible d'y déplacer une réservation." });
+      }
+      if (!availability.isOpen) {
+        return res.status(409).json({ message: "Cette session est fermée aux réservations." });
+      }
+
+      const activeCount = await countActiveReservationsBySession(sessionId, reservation.id);
+      if (activeCount >= availability.capacity) {
+        return res
+          .status(409)
+          .json({ message: "Cette session est complète. Merci de choisir une autre date." });
+      }
+
+      updates.sessionId = sessionId;
+      updates.sessionLabel = sessionOption.label;
+    }
+
+    if (status) {
+      const allowedStatuses: ReservationStatus[] = ["stripe_pending", "stripe_confirmed", "virement_en_attente", "cancelled"];
+      if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({ message: "Statut de réservation invalide." });
+      }
+      updates.status = status;
+    }
+
+    const updated = await updateReservationById(id, updates);
+    if (!updated) {
+      return res.status(404).json({ message: "Réservation introuvable." });
+    }
+
+    res.json({ reservation: updated });
+  } catch (error) {
+    console.error("Erreur admin/reservations:update:", error);
+    res.status(500).json({ message: "Impossible de mettre à jour la réservation." });
   }
 });
 

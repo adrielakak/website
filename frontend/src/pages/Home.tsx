@@ -61,7 +61,7 @@ function Home() {
           <div className="absolute left-1/4 top-10 h-64 w-64 rounded-full bg-brand-primary/40" />
           <div className="absolute bottom-16 right-16 h-72 w-72 rounded-full bg-brand-gold/25" />
         </div>
-        <div className="relative mx-auto flex max-w-6xl flex-col gap-14 px-6 pb-24 pt-32 md:flex-row md:items-center md:gap-20">
+        <div className="relative mx-auto flex max-w-6xl flex-col gap-14 px-4 pb-24 pt-32 sm:px-6 md:flex-row md:items-center md:gap-20 lg:max-w-7xl">
           <AnimatedContent distance={80}>
             <div className="flex-1 space-y-6">
               <p className="text-xs font-semibold uppercase tracking-[0.5em] text-white/60">
@@ -133,7 +133,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="relative mx-auto max-w-6xl px-6 py-24">
+      <section className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:max-w-7xl">
         <div className="grid gap-16 md:grid-cols-2">
           <AnimatedContent distance={100} delay={0.05}>
             <div>
@@ -188,7 +188,7 @@ function Home() {
       </section>
 
       <section className="bg-[#0d1324]">
-        <div className="mx-auto max-w-6xl px-6 py-24 space-y-16">
+        <div className="mx-auto max-w-6xl px-4 py-24 space-y-16 sm:px-6 lg:max-w-7xl">
           <AnimatedContent distance={80}>
             <div>
               <h2 className="section-title text-white">En images</h2>
@@ -203,7 +203,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-24">
+      <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:max-w-7xl">
         <AnimatedContent distance={70}>
           <div className="grid gap-10 md:grid-cols-3">
             {experienceHighlights.map((item) => (
@@ -217,7 +217,7 @@ function Home() {
       </section>
 
       <section className="bg-[#0d1324]">
-        <div className="mx-auto max-w-6xl px-6 py-24 space-y-12">
+        <div className="mx-auto max-w-6xl px-4 py-24 space-y-12 sm:px-6 lg:max-w-7xl">
           <AnimatedContent distance={70}>
             <div>
               <h2 className="section-title text-white">Paiement et réservation</h2>
@@ -241,7 +241,7 @@ function Home() {
       </section>
 
       <section className="bg-[#0d1324]">
-        <div className="mx-auto max-w-6xl px-6 pb-20">
+        <div className="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:max-w-7xl">
           <AnimatedContent distance={80}>
             <div>
               <h2 className="section-title text-white">Nathalie Karsenti en quelques liens</h2>
@@ -284,7 +284,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-24">
+      <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:max-w-7xl">
         <AnimatedContent distance={80}>
           <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-white/10 via-brand-primary/30 to-brand-dark/40 px-10 py-14 shadow-glow-soft backdrop-blur">
             <div className="absolute inset-0 opacity-20">

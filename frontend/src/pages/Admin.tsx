@@ -13,17 +13,21 @@ interface AdminAvailabilityItem {
   reservedCount: number;
   remaining: number;
   isOpen: boolean;
+  isCancelled: boolean;
 }
+
+type AdminReservationStatus = "stripe_pending" | "stripe_confirmed" | "virement_en_attente" | "cancelled";
 
 interface AdminReservation {
   id: string;
+  formationId: string;
   formationTitle: string;
   sessionLabel: string;
   sessionId: string;
   customerName: string;
   customerEmail: string;
   paymentMethod: "stripe" | "virement";
-  status: string;
+  status: AdminReservationStatus;
   stripeSessionId?: string;
   createdAt: string;
 }
@@ -37,6 +41,20 @@ interface AdminContactMessage {
   status: "new" | "handled";
 }
 
+const RESERVATION_STATUS_OPTIONS: AdminReservationStatus[] = [
+  "stripe_pending",
+  "stripe_confirmed",
+  "virement_en_attente",
+  "cancelled",
+];
+
+const RESERVATION_STATUS_LABELS: Record<AdminReservationStatus, string> = {
+  stripe_pending: "Stripe — en attente",
+  stripe_confirmed: "Stripe — confirmé",
+  virement_en_attente: "Virement — en attente",
+  cancelled: "Annulée",
+};
+
 function Admin() {
   const [adminKeyInput, setAdminKeyInput] = useState("");
   const [adminKey, setAdminKey] = useState<string | null>(null);
@@ -47,6 +65,9 @@ function Admin() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [savingSessionId, setSavingSessionId] = useState<string | null>(null);
+  const [reservationSessionDrafts, setReservationSessionDrafts] = useState<Record<string, string>>({});
+  const [reservationStatusDrafts, setReservationStatusDrafts] = useState<Record<string, AdminReservationStatus>>({});
+  const [updatingReservationId, setUpdatingReservationId] = useState<string | null>(null);
 
   const dateFormatter = useMemo(() => new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }), []);
 
@@ -73,6 +94,18 @@ function Admin() {
         }, {})
       );
       setReservations(reservationsResponse.data.reservations);
+      setReservationSessionDrafts(
+        reservationsResponse.data.reservations.reduce<Record<string, string>>((acc, reservation) => {
+          acc[reservation.id] = reservation.sessionId;
+          return acc;
+        }, {})
+      );
+      setReservationStatusDrafts(
+        reservationsResponse.data.reservations.reduce<Record<string, AdminReservationStatus>>((acc, reservation) => {
+          acc[reservation.id] = reservation.status;
+          return acc;
+        }, {})
+      );
       setContactMessages(contactResponse.data.messages);
       setAdminKey(key);
       setErrorMessage(null);
@@ -94,21 +127,50 @@ function Admin() {
     await fetchDashboard(adminKeyInput.trim());
   };
 
-  const updateAvailability = async (sessionId: string, updates: { capacity?: number; isOpen?: boolean }) => {
+const updateAvailability = async (
+  sessionId: string,
+  updates: { capacity?: number; isOpen?: boolean; isCancelled?: boolean }
+) => {
+  if (!adminKey) {
+    return;
+  }
+  try {
+    setSavingSessionId(sessionId);
+    await apiClient.put(`/api/admin/availability/${sessionId}`, updates, {
+      headers: { "x-admin-key": adminKey },
+    });
+    await fetchDashboard(adminKey);
+  } catch (error) {
+    console.error("Erreur mise à jour disponibilité:", error);
+    setErrorMessage("Impossible de mettre à jour la disponibilité. Réessayez plus tard.");
+  } finally {
+    setSavingSessionId(null);
+  }
+};
+
+  const updateReservation = async (
+    reservationId: string,
+    updates: { sessionId?: string; status?: AdminReservationStatus }
+  ) => {
     if (!adminKey) {
       return;
     }
+
+    if (!updates.sessionId && !updates.status) {
+      return;
+    }
+
     try {
-      setSavingSessionId(sessionId);
-      await apiClient.put(`/api/admin/availability/${sessionId}`, updates, {
+      setUpdatingReservationId(reservationId);
+      await apiClient.patch(`/api/admin/reservations/${reservationId}`, updates, {
         headers: { "x-admin-key": adminKey },
       });
       await fetchDashboard(adminKey);
     } catch (error) {
-      console.error("Erreur mise à jour disponibilité:", error);
-      setErrorMessage("Impossible de mettre à jour la disponibilité. Réessayez plus tard.");
+      console.error("Erreur mise à jour réservation:", error);
+      setErrorMessage("Impossible de mettre à jour la réservation. Réessayez plus tard.");
     } finally {
-      setSavingSessionId(null);
+      setUpdatingReservationId(null);
     }
   };
 
@@ -165,6 +227,22 @@ function Admin() {
       };
     });
   }, [availability, reservations]);
+
+  const sessionsByFormation = useMemo(() => {
+    const grouped = availability.reduce<Record<string, AdminAvailabilityItem[]>>((acc, session) => {
+      acc[session.formationId] = acc[session.formationId] ?? [];
+      acc[session.formationId].push(session);
+      return acc;
+    }, {});
+
+    for (const key of Object.keys(grouped)) {
+      grouped[key] = grouped[key]
+        .slice()
+        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+    }
+
+    return grouped;
+  }, [availability]);
 
   if (!adminKey) {
     return (
@@ -240,6 +318,17 @@ function Admin() {
             {availability.map((session) => {
               const draftValue = capacityDrafts[session.sessionId] ?? session.capacity;
               const isSaving = savingSessionId === session.sessionId;
+              const statusLabel = session.isCancelled
+                ? "Session annulée"
+                : session.isOpen
+                ? "Session ouverte"
+                : "Session fermée";
+              const statusClasses = session.isCancelled
+                ? "border-red-500/40 bg-red-500/15 text-red-200"
+                : session.isOpen
+                ? "border-emerald-400/40 bg-emerald-400/15 text-emerald-200"
+                : "border-amber-400/40 bg-amber-400/15 text-amber-200";
+
               return (
                 <div
                   key={session.sessionId}
@@ -249,11 +338,23 @@ function Admin() {
                     <div>
                       <p className="text-sm uppercase tracking-[0.3em] text-brand-gold/80">{session.sessionLabel}</p>
                       <h3 className="text-xl font-semibold text-white">{session.formationTitle}</h3>
-                      <p className="mt-1 text-xs text-white/60">
-                        Réservations confirmées ou en attente&nbsp;: {session.reservedCount} &nbsp;•&nbsp; Restant&nbsp;:
-                        {" "}
-                        {session.remaining}
-                      </p>
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-white/60">
+                        <span>
+                          Réservations confirmées ou en attente&nbsp;: {session.reservedCount} &nbsp;•&nbsp; Restant&nbsp;:
+                          {" "}
+                          {session.remaining}
+                        </span>
+                        <span
+                          className={`inline-flex rounded-full border px-3 py-1 font-semibold ${statusClasses}`}
+                        >
+                          {statusLabel}
+                        </span>
+                      </div>
+                      {session.isCancelled && (
+                        <p className="mt-2 text-xs text-red-200">
+                          Session annulée : les nouvelles inscriptions et paiements sont bloqués.
+                        </p>
+                      )}
                     </div>
                     <div className="flex flex-col gap-3 md:w-80">
                       <label className="text-xs font-semibold uppercase tracking-[0.3em] text-white/60" htmlFor={`capacity-${session.sessionId}`}>
@@ -282,18 +383,39 @@ function Admin() {
                           {isSaving ? "Enregistrement..." : "Mettre à jour"}
                         </button>
                       </div>
-                      <button
-                        type="button"
-                        className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
-                          session.isOpen
-                            ? "border-emerald-400/40 text-emerald-200 hover:bg-emerald-400/10"
-                            : "border-amber-400/40 text-amber-200 hover:bg-amber-400/10"
-                        }`}
-                        onClick={() => updateAvailability(session.sessionId, { isOpen: !session.isOpen })}
-                        disabled={isSaving}
-                      >
-                        {session.isOpen ? "Session ouverte" : "Session fermée"}
-                      </button>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
+                            session.isOpen && !session.isCancelled
+                              ? "border-emerald-400/40 text-emerald-200 hover:bg-emerald-400/10"
+                              : "border-amber-400/40 text-amber-200 hover:bg-amber-400/10"
+                          } ${session.isCancelled ? "cursor-not-allowed opacity-40" : ""}`}
+                          onClick={() => updateAvailability(session.sessionId, { isOpen: !session.isOpen })}
+                          disabled={isSaving || session.isCancelled}
+                        >
+                          {session.isOpen && !session.isCancelled ? "Fermer temporairement" : "Ouvrir aux inscriptions"}
+                        </button>
+                        <button
+                          type="button"
+                          className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
+                            session.isCancelled
+                              ? "border-emerald-400/40 text-emerald-200 hover:bg-emerald-400/10"
+                              : "border-red-400/40 text-red-200 hover:bg-red-400/10"
+                          }`}
+                          onClick={() =>
+                            updateAvailability(
+                              session.sessionId,
+                              session.isCancelled
+                                ? { isCancelled: false, isOpen: true }
+                                : { isCancelled: true }
+                            )
+                          }
+                          disabled={isSaving}
+                        >
+                          {session.isCancelled ? "Réactiver la session" : "Annuler la session"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -311,20 +433,42 @@ function Admin() {
             Visualisez l&apos;occupation de chaque session et les participants déjà inscrits.
           </p>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
-            {sessionsWithParticipants.map((session) => (
-              <div key={session.sessionId} className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-brand-gold/80">{session.sessionLabel}</p>
-                    <h3 className="mt-1 text-lg font-semibold text-white">{session.formationTitle}</h3>
-                    <p className="text-xs text-white/50">
-                      {session.reservedCount}/{session.capacity} places • {session.percent}% rempli
-                    </p>
+            {sessionsWithParticipants.map((session) => {
+              const statusLabel = session.isCancelled
+                ? "Session annulée"
+                : session.isOpen
+                ? "Session ouverte"
+                : "Session fermée";
+              const statusClasses = session.isCancelled
+                ? "border-red-500/40 bg-red-500/15 text-red-200"
+                : session.isOpen
+                ? "border-emerald-400/40 bg-emerald-400/15 text-emerald-200"
+                : "border-amber-400/40 bg-amber-400/15 text-amber-200";
+
+              return (
+                <div key={session.sessionId} className="rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.3em] text-brand-gold/80">{session.sessionLabel}</p>
+                      <h3 className="mt-1 text-lg font-semibold text-white">{session.formationTitle}</h3>
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-white/50">
+                        <span>
+                          {session.reservedCount}/{session.capacity} places • {session.percent}% rempli
+                        </span>
+                        <span className={`inline-flex rounded-full border px-3 py-1 font-semibold ${statusClasses}`}>
+                          {statusLabel}
+                        </span>
+                      </div>
+                      {session.isCancelled && (
+                        <p className="mt-2 text-xs text-red-200">
+                          Session annulée : pensez à prévenir les participants déjà inscrits.
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-brand-primary/40 bg-brand-primary/10 text-center text-sm font-semibold text-brand-gold">
+                      {session.percent}%
+                    </div>
                   </div>
-                  <div className="h-16 w-16 rounded-full border-2 border-brand-primary/40 bg-brand-primary/10 text-center text-sm font-semibold text-brand-gold flex items-center justify-center">
-                    {session.percent}%
-                  </div>
-                </div>
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-brand-primary to-brand-gold"
@@ -349,7 +493,8 @@ function Admin() {
                   )}
                 </div>
               </div>
-            ))}
+            );
+            })}
             {sessionsWithParticipants.length === 0 && !isLoading && (
               <p className="text-sm text-white/60">Aucune session planifiée.</p>
             )}
@@ -370,42 +515,111 @@ function Admin() {
                   <th className="px-4 py-3 text-left">Session</th>
                   <th className="px-4 py-3 text-left">Paiement</th>
                   <th className="px-4 py-3 text-left">Statut</th>
+                  <th className="px-4 py-3 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {reservations.map((reservation) => (
-                  <tr key={reservation.id}>
-                    <td className="px-4 py-3 text-white/60">
-                      {dateFormatter.format(new Date(reservation.createdAt))}
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="font-semibold text-white">{reservation.customerName}</p>
-                      <p className="text-xs text-white/50">{reservation.customerEmail}</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="font-semibold text-white">{reservation.formationTitle}</p>
-                      <p className="text-xs text-white/50">{reservation.sessionLabel}</p>
-                    </td>
-                    <td className="px-4 py-3 text-white/70">
-                      {reservation.paymentMethod === "stripe" ? "Stripe" : "Virement"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                          reservation.status === "stripe_confirmed"
-                            ? "bg-emerald-400/15 text-emerald-200"
-                            : reservation.status === "stripe_pending"
-                            ? "bg-amber-400/15 text-amber-200"
-                            : reservation.status === "cancelled"
-                            ? "bg-red-400/20 text-red-200"
-                            : "bg-white/10 text-white/70"
-                        }`}
-                      >
-                        {reservation.status.replace(/_/g, " ")}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {reservations.map((reservation) => {
+                  const sessionDraft = reservationSessionDrafts[reservation.id] ?? reservation.sessionId;
+                  const statusDraft = reservationStatusDrafts[reservation.id] ?? reservation.status;
+                  const sessionOptions = sessionsByFormation[reservation.formationId] ?? [];
+                  const isUpdatingReservation = updatingReservationId === reservation.id;
+                  const hasSessionChange = Boolean(sessionDraft && sessionDraft !== reservation.sessionId);
+                  const hasStatusChange = statusDraft !== reservation.status;
+                  const hasPendingChanges = hasSessionChange || hasStatusChange;
+
+                  return (
+                    <tr key={reservation.id}>
+                      <td className="px-4 py-3 text-white/60">
+                        {dateFormatter.format(new Date(reservation.createdAt))}
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="font-semibold text-white">{reservation.customerName}</p>
+                        <p className="text-xs text-white/50">{reservation.customerEmail}</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="font-semibold text-white">{reservation.formationTitle}</p>
+                        <p className="text-xs text-white/50">{reservation.sessionLabel}</p>
+                      </td>
+                      <td className="px-4 py-3 text-white/70">
+                        {reservation.paymentMethod === "stripe" ? "Stripe" : "Virement"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                            reservation.status === "stripe_confirmed"
+                              ? "bg-emerald-400/15 text-emerald-200"
+                              : reservation.status === "stripe_pending"
+                              ? "bg-amber-400/15 text-amber-200"
+                              : reservation.status === "cancelled"
+                              ? "bg-red-400/20 text-red-200"
+                              : "bg-white/10 text-white/70"
+                          }`}
+                        >
+                          {RESERVATION_STATUS_LABELS[reservation.status]}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-col gap-2">
+                          <select
+                            value={sessionDraft}
+                            onChange={(event) =>
+                              setReservationSessionDrafts((prev) => ({
+                                ...prev,
+                                [reservation.id]: event.target.value,
+                              }))
+                            }
+                            className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                          >
+                            {sessionOptions.map((option) => (
+                              <option
+                                key={option.sessionId}
+                                value={option.sessionId}
+                                disabled={option.isCancelled && option.sessionId !== reservation.sessionId}
+                              >
+                                {option.sessionLabel}
+                                {option.isCancelled
+                                  ? " — annulée"
+                                  : option.remaining <= 0
+                                  ? " — complet"
+                                  : ""}
+                              </option>
+                            ))}
+                          </select>
+                          <select
+                            value={statusDraft}
+                            onChange={(event) =>
+                              setReservationStatusDrafts((prev) => ({
+                                ...prev,
+                                [reservation.id]: event.target.value as AdminReservationStatus,
+                              }))
+                            }
+                            className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                          >
+                            {RESERVATION_STATUS_OPTIONS.map((statusOption) => (
+                              <option key={statusOption} value={statusOption}>
+                                {RESERVATION_STATUS_LABELS[statusOption]}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            type="button"
+                            className="btn-primary text-[10px] uppercase tracking-[0.35em] disabled:opacity-60"
+                            disabled={!hasPendingChanges || isUpdatingReservation}
+                            onClick={() =>
+                              updateReservation(reservation.id, {
+                                ...(hasSessionChange ? { sessionId: sessionDraft } : {}),
+                                ...(hasStatusChange ? { status: statusDraft } : {}),
+                              })
+                            }
+                          >
+                            {isUpdatingReservation ? "Mise à jour..." : "Appliquer"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
             {reservations.length === 0 && !isLoading && (

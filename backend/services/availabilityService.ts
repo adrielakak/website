@@ -7,6 +7,7 @@ export interface SessionAvailability {
   sessionId: string;
   capacity: number;
   isOpen: boolean;
+  isCancelled: boolean;
 }
 
 type AvailabilityState = Record<string, SessionAvailability>;
@@ -45,6 +46,7 @@ export async function ensureAvailabilityDefaults(formations: Formation[]): Promi
           sessionId: session.id,
           capacity: DEFAULT_CAPACITY,
           isOpen: true,
+          isCancelled: false,
         };
         changed = true;
       }
@@ -58,6 +60,14 @@ export async function ensureAvailabilityDefaults(formations: Formation[]): Promi
   for (const sessionId of Object.keys(state)) {
     if (!knownSessionIds.has(sessionId)) {
       delete state[sessionId];
+      changed = true;
+    }
+    if (state[sessionId] && typeof state[sessionId].isCancelled !== "boolean") {
+      state[sessionId].isCancelled = false;
+      changed = true;
+    }
+    if (state[sessionId]?.isCancelled && state[sessionId].isOpen) {
+      state[sessionId].isOpen = false;
       changed = true;
     }
   }
@@ -74,26 +84,34 @@ export async function getSessionAvailability(sessionId: string): Promise<Session
       sessionId,
       capacity: DEFAULT_CAPACITY,
       isOpen: true,
+      isCancelled: false,
     }
   );
 }
 
 export async function upsertSessionAvailability(
   sessionId: string,
-  updates: Partial<Pick<SessionAvailability, "capacity" | "isOpen">>
+  updates: Partial<Pick<SessionAvailability, "capacity" | "isOpen" | "isCancelled">>
 ): Promise<SessionAvailability> {
   const state = await readAvailabilityState();
   const current = state[sessionId] ?? {
     sessionId,
     capacity: DEFAULT_CAPACITY,
     isOpen: true,
+    isCancelled: false,
   };
   const next: SessionAvailability = {
     ...current,
     ...updates,
     capacity:
       typeof updates.capacity === "number" && updates.capacity >= 0 ? Math.floor(updates.capacity) : current.capacity,
+    isCancelled: typeof updates.isCancelled === "boolean" ? updates.isCancelled : current.isCancelled,
   };
+  if (next.isCancelled) {
+    next.isOpen = false;
+  } else if (updates.isCancelled === false && current.isCancelled && updates.isOpen === undefined) {
+    next.isOpen = true;
+  }
   state[sessionId] = next;
   await writeAvailabilityState(state);
   return next;
@@ -121,7 +139,11 @@ export async function getAvailabilityList(formations: Formation[]): Promise<
       startDate: session.startDate,
       endDate: session.endDate,
       capacity: state[session.id]?.capacity ?? DEFAULT_CAPACITY,
-      isOpen: state[session.id]?.isOpen ?? true,
+      isCancelled: state[session.id]?.isCancelled ?? false,
+      isOpen:
+        state[session.id]?.isCancelled ?? false
+          ? false
+          : state[session.id]?.isOpen ?? true,
     }))
   );
 }

@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Footer() {
   return (
     <footer className="border-t border-white/10 bg-brand-midnight">
@@ -12,6 +14,12 @@ function Footer() {
             nk26fr@gmail.com
           </a>
           <p className="mt-1 text-white/70">Tél. : 06 52 89 74 10</p>
+          <Link
+            to="/reservations"
+            className="inline-flex items-center gap-2 text-white hover:text-brand-gold"
+          >
+            Gérer ma réservation
+          </Link>
         </div>
         <div className="text-xs text-white/40">
           © {new Date().getFullYear()} Ateliers Théâtre de Nantes. Tous droits réservés.

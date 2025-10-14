@@ -41,6 +41,10 @@ function resolveLineItems(formation, sessionLabel, configuredValue) {
         },
     ];
 }
+function resolveClientBaseUrl() {
+    const raw = process.env.CLIENT_URL ?? "http://localhost:5173";
+    return raw.trim().replace(/\/+$/, "");
+}
 router.post("/create-checkout-session", async (req, res) => {
     const { customerName, customerEmail, formationId, sessionId } = req.body ?? {};
     if (!customerName || !customerEmail || !formationId || !sessionId) {
@@ -64,6 +68,9 @@ router.post("/create-checkout-session", async (req, res) => {
         getSessionAvailability(sessionId),
         countActiveReservationsBySession(sessionId),
     ]);
+    if (availability.isCancelled) {
+        return res.status(409).json({ message: "Cette session a été annulée. Merci de choisir une autre date." });
+    }
     if (!availability.isOpen) {
         return res.status(409).json({ message: "Cette session est momentanément fermée aux réservations." });
     }
@@ -78,7 +85,7 @@ router.post("/create-checkout-session", async (req, res) => {
         customerEmail,
     };
     try {
-        const successBase = process.env.CLIENT_URL ?? "http://localhost:5173";
+        const successBase = resolveClientBaseUrl();
         const checkoutSession = await stripe.checkout.sessions.create({
             mode: "payment",
             customer_email: customerEmail,

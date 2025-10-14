@@ -87,6 +87,10 @@ router.post("/create-checkout-session", async (req, res) => {
     countActiveReservationsBySession(sessionId),
   ]);
 
+  if (availability.isCancelled) {
+    return res.status(409).json({ message: "Cette session a été annulée. Merci de choisir une autre date." });
+  }
+
   if (!availability.isOpen) {
     return res.status(409).json({ message: "Cette session est momentanément fermée aux réservations." });
   }

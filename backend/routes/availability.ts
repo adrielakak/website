@@ -24,9 +24,10 @@ router.get("/", async (_req, res) => {
         startDate: item.startDate,
         endDate: item.endDate,
         capacity: item.capacity,
-        isOpen: item.isOpen,
+        isOpen: item.isOpen && !item.isCancelled,
+        isCancelled: item.isCancelled,
         reservedCount,
-        remaining: Math.max(item.capacity - reservedCount, 0),
+        remaining: item.isCancelled ? 0 : Math.max(item.capacity - reservedCount, 0),
       };
     });
 

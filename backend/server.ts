@@ -11,9 +11,14 @@ import { addContactMessage } from "./services/contactStorage.js";
 import {
   addReservation,
   countActiveReservationsBySession,
+  findReservationById,
+  readReservations,
+  ReservationRecord,
+  updateReservationById,
 } from "./services/reservationStorage.js";
 import {
   ensureAvailabilityDefaults,
+  getAvailabilityList,
   getSessionAvailability,
 } from "./services/availabilityService.js";
 import { sendReservationConfirmationEmail } from "./services/emailService.js";
@@ -85,6 +90,12 @@ app.post("/api/reservations", async (req, res) => {
     countActiveReservationsBySession(sessionId),
   ]);
 
+  if (availability.isCancelled) {
+    return res
+      .status(409)
+      .json({ message: "Cette session a été annulée. Merci de choisir une autre date ou de nous contacter." });
+  }
+
   if (!availability.isOpen) {
     return res.status(409).json({ message: "Cette session est momentanément fermée aux réservations." });
   }
@@ -140,6 +151,148 @@ app.post("/api/contact", async (req, res) => {
   } catch (error) {
     console.error("Erreur lors de l'enregistrement du message de contact:", error);
     return res.status(500).json({ message: "Impossible d'enregistrer votre message pour le moment." });
+  }
+});
+
+app.post("/api/reservations/manage", async (req, res) => {
+  const { reservationId, customerEmail } = req.body ?? {};
+
+  if (!reservationId || !customerEmail) {
+    return res.status(400).json({ message: "Merci de renseigner l'identifiant de réservation et votre email." });
+  }
+
+  try {
+    const reservation = await findReservationById(reservationId);
+    if (
+      !reservation ||
+      reservation.customerEmail.trim().toLowerCase() !== String(customerEmail).trim().toLowerCase()
+    ) {
+      return res.status(404).json({ message: "Réservation introuvable. Vérifiez les informations saisies." });
+    }
+
+    const [availabilityList, reservations] = await Promise.all([getAvailabilityList(formations), readReservations()]);
+    const activeStatuses = new Set<ReservationRecord["status"]>(["stripe_pending", "stripe_confirmed", "virement_en_attente"]);
+
+    const sessions = availabilityList
+      .filter((session) => session.formationId === reservation.formationId)
+      .map((session) => {
+        const reservedCount = reservations.filter(
+          (entry) => entry.sessionId === session.sessionId && activeStatuses.has(entry.status)
+        ).length;
+
+        return {
+          sessionId: session.sessionId,
+          sessionLabel: session.sessionLabel,
+          startDate: session.startDate,
+          endDate: session.endDate,
+          capacity: session.capacity,
+          isOpen: session.isOpen && !session.isCancelled,
+          isCancelled: session.isCancelled,
+          reservedCount,
+          remaining: session.isCancelled ? 0 : Math.max(session.capacity - reservedCount, 0),
+        };
+      });
+
+    const sanitizedReservation = {
+      id: reservation.id,
+      formationId: reservation.formationId,
+      formationTitle: reservation.formationTitle,
+      sessionId: reservation.sessionId,
+      sessionLabel: reservation.sessionLabel,
+      customerName: reservation.customerName,
+      customerEmail: reservation.customerEmail,
+      paymentMethod: reservation.paymentMethod,
+      status: reservation.status,
+      createdAt: reservation.createdAt,
+    };
+
+    return res.json({
+      reservation: sanitizedReservation,
+      sessions,
+    });
+  } catch (error) {
+    console.error("Erreur manage reservation:", error);
+    return res.status(500).json({ message: "Impossible de récupérer la réservation pour le moment." });
+  }
+});
+
+app.patch("/api/reservations/:reservationId", async (req, res) => {
+  const { reservationId } = req.params;
+  const { customerEmail, sessionId: nextSessionId } = req.body ?? {};
+
+  if (!customerEmail || !nextSessionId) {
+    return res.status(400).json({ message: "Merci de préciser l'email et la nouvelle session souhaitée." });
+  }
+
+  try {
+    const reservation = await findReservationById(reservationId);
+    if (
+      !reservation ||
+      reservation.customerEmail.trim().toLowerCase() !== String(customerEmail).trim().toLowerCase()
+    ) {
+      return res.status(404).json({ message: "Réservation introuvable pour cet email." });
+    }
+
+    if (reservation.status === "cancelled") {
+      return res
+        .status(409)
+        .json({ message: "Cette réservation est annulée. Merci de nous contacter pour toute assistance." });
+    }
+
+    const formation = formations.find((form) => form.id === reservation.formationId);
+    if (!formation) {
+      return res.status(404).json({ message: "Formation associée introuvable." });
+    }
+
+    const targetSession = formation.sessions.find((session) => session.id === nextSessionId);
+    if (!targetSession) {
+      return res.status(404).json({ message: "Session introuvable pour cette formation." });
+    }
+
+    const availability = await getSessionAvailability(nextSessionId);
+    if (availability.isCancelled) {
+      return res.status(409).json({ message: "Cette session a été annulée." });
+    }
+    if (!availability.isOpen) {
+      return res.status(409).json({ message: "Cette session est fermée aux réservations." });
+    }
+
+    const activeCount = await countActiveReservationsBySession(nextSessionId, reservation.id);
+    if (activeCount >= availability.capacity) {
+      return res
+        .status(409)
+        .json({ message: "Cette session est complète. Merci de choisir une autre date disponible." });
+    }
+
+    const updated = await updateReservationById(reservation.id, {
+      sessionId: nextSessionId,
+      sessionLabel: targetSession.label,
+    });
+
+    if (!updated) {
+      return res.status(500).json({ message: "Impossible de mettre à jour la réservation." });
+    }
+
+    const sanitizedReservation = {
+      id: updated.id,
+      formationId: updated.formationId,
+      formationTitle: updated.formationTitle,
+      sessionId: updated.sessionId,
+      sessionLabel: updated.sessionLabel,
+      customerName: updated.customerName,
+      customerEmail: updated.customerEmail,
+      paymentMethod: updated.paymentMethod,
+      status: updated.status,
+      createdAt: updated.createdAt,
+    };
+
+    return res.json({
+      message: "Votre changement de session est confirmé.",
+      reservation: sanitizedReservation,
+    });
+  } catch (error) {
+    console.error("Erreur update reservation:", error);
+    return res.status(500).json({ message: "Impossible de modifier la réservation pour le moment." });
   }
 });
 

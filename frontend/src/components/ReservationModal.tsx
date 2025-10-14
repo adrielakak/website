@@ -3,9 +3,16 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { apiClient } from "../lib/api";
 import { Formation } from "../types";
 
+interface SessionAvailabilitySnapshot {
+  isOpen: boolean;
+  remaining: number;
+  isCancelled?: boolean;
+}
+
 interface ReservationModalProps {
   isOpen: boolean;
   formation: Formation | null;
+  availability?: Record<string, SessionAvailabilitySnapshot>;
   onClose: () => void;
 }
 
@@ -25,7 +32,7 @@ const buildInitialState = (): FormValues => ({
   paymentMethod: "stripe",
 });
 
-function ReservationModal({ isOpen, formation, onClose }: ReservationModalProps) {
+function ReservationModal({ isOpen, formation, availability, onClose }: ReservationModalProps) {
   const [formValues, setFormValues] = useState<FormValues>(buildInitialState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -34,21 +41,32 @@ function ReservationModal({ isOpen, formation, onClose }: ReservationModalProps)
 
   useEffect(() => {
     if (formation) {
+      const firstAvailableSession =
+        formation.sessions.find((session) => {
+          const info = availability?.[session.id];
+          return !info || (!info.isCancelled && info.isOpen && info.remaining > 0);
+        }) ?? formation.sessions[0];
+
       setFormValues({
         customerName: "",
         customerEmail: "",
-        sessionId: formation.sessions[0]?.id ?? "",
+        sessionId: firstAvailableSession?.id ?? "",
         paymentMethod: "stripe",
       });
       setErrorMessage(null);
       setSuccessMessage(null);
       setIban(null);
     }
-  }, [formation, isOpen]);
+  }, [formation, availability, isOpen]);
 
   if (!isOpen || !formation) {
     return null;
   }
+
+  const selectedSessionInfo = formValues.sessionId ? availability?.[formValues.sessionId] : undefined;
+  const isSelectedSessionCancelled = selectedSessionInfo?.isCancelled ?? false;
+  const isSelectedSessionOpen = selectedSessionInfo ? selectedSessionInfo.isOpen : true;
+  const hasSelectedSessionSeats = selectedSessionInfo ? selectedSessionInfo.remaining > 0 : true;
 
   const handleChange =
     (field: keyof FormValues) => (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -63,6 +81,16 @@ function ReservationModal({ isOpen, formation, onClose }: ReservationModalProps)
     setIban(null);
 
     try {
+      if (isSelectedSessionCancelled) {
+        setErrorMessage("Cette session a été annulée. Merci de sélectionner une autre date.");
+        return;
+      }
+
+      if (!isSelectedSessionOpen || !hasSelectedSessionSeats) {
+        setErrorMessage("Cette session est complète ou fermée aux réservations.");
+        return;
+      }
+
       if (!formValues.sessionId) {
         throw new Error("Merci de sélectionner une session.");
       }
@@ -183,11 +211,41 @@ function ReservationModal({ isOpen, formation, onClose }: ReservationModalProps)
             >
               <option value="">Sélectionnez une session</option>
               {formation.sessions.map((session) => (
-                <option key={session.id} value={session.id}>
+                <option
+                  key={session.id}
+                  value={session.id}
+                  disabled={Boolean(availability?.[session.id]?.isCancelled)}
+                >
                   {session.label}
+                  {(() => {
+                    const info = availability?.[session.id];
+                    if (!info) {
+                      return "";
+                    }
+                    if (info.isCancelled) {
+                      return " – session annulée";
+                    }
+                    if (!info.isOpen) {
+                      return " – session fermée";
+                    }
+                    if (info.remaining <= 0) {
+                      return " – complet";
+                    }
+                    return ` – ${info.remaining} place${info.remaining > 1 ? "s" : ""} restantes`;
+                  })()}
                 </option>
               ))}
             </select>
+            {isSelectedSessionCancelled && (
+              <p className="mt-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
+                Cette session a été annulée. Merci de sélectionner une autre date disponible.
+              </p>
+            )}
+            {!isSelectedSessionCancelled && (!isSelectedSessionOpen || !hasSelectedSessionSeats) && (
+              <p className="mt-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
+                Cette session est momentanément indisponible. N&apos;hésitez pas à choisir une autre date.
+              </p>
+            )}
           </div>
 
           <div>

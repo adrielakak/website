@@ -7,6 +7,7 @@ const navLinks = [
   { path: "/", label: "Accueil" },
   { path: "/formations", label: "Formations" },
   { path: "/contact", label: "Contact" },
+  { path: "/reservations", label: "Ma réservation" },
 ];
 
 function Navbar() {

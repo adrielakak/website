@@ -1,7 +1,7 @@
 import fs from "fs-extra";
-import path from "path";
+import { resolveDataPath } from "./storagePaths.js";
 const DEFAULT_CAPACITY = Number(process.env.DEFAULT_SESSION_CAPACITY ?? 12);
-const AVAILABILITY_PATH = path.resolve(process.cwd(), "data", "availability.json");
+const AVAILABILITY_PATH = resolveDataPath("availability.json");
 async function ensureStorage() {
     const exists = await fs.pathExists(AVAILABILITY_PATH);
     if (!exists) {
@@ -29,6 +29,7 @@ export async function ensureAvailabilityDefaults(formations) {
                     sessionId: session.id,
                     capacity: DEFAULT_CAPACITY,
                     isOpen: true,
+                    isCancelled: false,
                 };
                 changed = true;
             }
@@ -38,6 +39,14 @@ export async function ensureAvailabilityDefaults(formations) {
     for (const sessionId of Object.keys(state)) {
         if (!knownSessionIds.has(sessionId)) {
             delete state[sessionId];
+            changed = true;
+        }
+        if (state[sessionId] && typeof state[sessionId].isCancelled !== "boolean") {
+            state[sessionId].isCancelled = false;
+            changed = true;
+        }
+        if (state[sessionId]?.isCancelled && state[sessionId].isOpen) {
+            state[sessionId].isOpen = false;
             changed = true;
         }
     }
@@ -51,6 +60,7 @@ export async function getSessionAvailability(sessionId) {
         sessionId,
         capacity: DEFAULT_CAPACITY,
         isOpen: true,
+        isCancelled: false,
     });
 }
 export async function upsertSessionAvailability(sessionId, updates) {
@@ -59,12 +69,20 @@ export async function upsertSessionAvailability(sessionId, updates) {
         sessionId,
         capacity: DEFAULT_CAPACITY,
         isOpen: true,
+        isCancelled: false,
     };
     const next = {
         ...current,
         ...updates,
         capacity: typeof updates.capacity === "number" && updates.capacity >= 0 ? Math.floor(updates.capacity) : current.capacity,
+        isCancelled: typeof updates.isCancelled === "boolean" ? updates.isCancelled : current.isCancelled,
     };
+    if (next.isCancelled) {
+        next.isOpen = false;
+    }
+    else if (updates.isCancelled === false && current.isCancelled && updates.isOpen === undefined) {
+        next.isOpen = true;
+    }
     state[sessionId] = next;
     await writeAvailabilityState(state);
     return next;
@@ -79,6 +97,9 @@ export async function getAvailabilityList(formations) {
         startDate: session.startDate,
         endDate: session.endDate,
         capacity: state[session.id]?.capacity ?? DEFAULT_CAPACITY,
-        isOpen: state[session.id]?.isOpen ?? true,
+        isCancelled: state[session.id]?.isCancelled ?? false,
+        isOpen: state[session.id]?.isCancelled ?? false
+            ? false
+            : state[session.id]?.isOpen ?? true,
     })));
 }

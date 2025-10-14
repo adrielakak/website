@@ -97,16 +97,34 @@ export async function addReservation(input: ReservationInput): Promise<Reservati
   return record;
 }
 
-export async function countActiveReservationsBySession(sessionId: string): Promise<number> {
+export async function countActiveReservationsBySession(
+  sessionId: string,
+  excludeReservationId?: string
+): Promise<number> {
   const reservations = await readReservations();
   return reservations.filter(
-    (reservation) => reservation.sessionId === sessionId && ACTIVE_STATUSES.includes(reservation.status)
+    (reservation) =>
+      reservation.sessionId === sessionId &&
+      ACTIVE_STATUSES.includes(reservation.status) &&
+      reservation.id !== excludeReservationId
   ).length;
 }
 
-interface ReservationUpdate {
+export async function findReservationById(id: string): Promise<ReservationRecord | null> {
+  if (!id) {
+    return null;
+  }
+  const reservations = await readReservations();
+  return reservations.find((reservation) => reservation.id === id) ?? null;
+}
+
+export interface ReservationUpdate {
   status?: ReservationStatus;
   stripeSessionId?: string;
+  sessionId?: string;
+  sessionLabel?: string;
+  formationId?: string;
+  formationTitle?: string;
 }
 
 export async function updateReservationByStripeSession(
@@ -119,6 +137,32 @@ export async function updateReservationByStripeSession(
 
   const reservations = await readReservations();
   const index = reservations.findIndex((reservation) => reservation.stripeSessionId === stripeSessionId);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const current = reservations[index];
+  const next: ReservationRecord = {
+    ...current,
+    ...updates,
+  };
+
+  reservations[index] = next;
+  await writeReservations(reservations);
+  return next;
+}
+
+export async function updateReservationById(
+  reservationId: string,
+  updates: ReservationUpdate
+): Promise<ReservationRecord | null> {
+  if (!reservationId) {
+    return null;
+  }
+
+  const reservations = await readReservations();
+  const index = reservations.findIndex((reservation) => reservation.id === reservationId);
 
   if (index === -1) {
     return null;

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import ReservationModal from "../components/ReservationModal";
 import AnimatedContent from "../components/reactbits/AnimatedContent";
@@ -10,6 +10,7 @@ interface SessionAvailabilityInfo {
   sessionId: string;
   capacity: number;
   isOpen: boolean;
+  isCancelled: boolean;
   reservedCount: number;
   remaining: number;
 }
@@ -46,9 +47,10 @@ function QuickStripeCheckoutForm({
   onLoadingChange,
 }: QuickStripeCheckoutFormProps) {
   const sessionAvailability = sessionId ? availability[sessionId] : undefined;
+  const isSessionCancelled = sessionAvailability ? sessionAvailability.isCancelled : false;
   const isSessionOpen = sessionAvailability ? sessionAvailability.isOpen : true;
   const hasSeats = sessionAvailability ? sessionAvailability.remaining > 0 : true;
-  const isSessionAvailable = isSessionOpen && hasSeats;
+  const isSessionAvailable = !isSessionCancelled && isSessionOpen && hasSeats;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -63,8 +65,13 @@ function QuickStripeCheckoutForm({
       return;
     }
 
+    if (isSessionCancelled) {
+      onErrorChange("Cette session a été annulée. Merci de sélectionner une autre date.");
+      return;
+    }
+
     if (!isSessionAvailable) {
-      onErrorChange("Cette session est complète ou fermée aux réservations.");
+      onErrorChange("Cette session est complète ou momentanément fermée aux réservations.");
       return;
     }
 
@@ -157,13 +164,28 @@ function QuickStripeCheckoutForm({
             Selectionner
           </option>
           {formation.sessions.map((session) => (
-            <option key={session.id} value={session.id}>
+            <option
+              key={session.id}
+              value={session.id}
+              disabled={Boolean(availability[session.id]?.isCancelled)}
+            >
               {session.label}
-              {availability[session.id]
-                ? availability[session.id].remaining > 0
-                  ? ` – ${availability[session.id].remaining} places restantes`
-                  : " – complet"
-                : ""}
+              {(() => {
+                const info = availability[session.id];
+                if (!info) {
+                  return "";
+                }
+                if (info.isCancelled) {
+                  return " – session annulée";
+                }
+                if (!info.isOpen) {
+                  return " – session fermée";
+                }
+                if (info.remaining <= 0) {
+                  return " – complet";
+                }
+                return ` – ${info.remaining} place${info.remaining > 1 ? "s" : ""} restantes`;
+              })()}
             </option>
           ))}
         </select>
@@ -183,7 +205,12 @@ function QuickStripeCheckoutForm({
           {errorMessage}
         </div>
       )}
-      {!isSessionAvailable && (
+      {isSessionCancelled && (
+        <div className="md:col-span-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          Cette session a été annulée. Merci de sélectionner une autre date.
+        </div>
+      )}
+      {!isSessionCancelled && !isSessionAvailable && (
         <div className="md:col-span-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
           Cette session est complète ou momentanément fermée aux réservations. Merci de choisir une autre date ou de
           nous contacter.
@@ -290,14 +317,14 @@ function Formations() {
 
       if (current && sessions.some((session) => session.id === current)) {
         const info = availability[current];
-        if (!info || (info.isOpen && info.remaining > 0)) {
+        if (!info || (!info.isCancelled && info.isOpen && info.remaining > 0)) {
           return current;
         }
       }
 
       const firstAvailable = sessions.find((session) => {
         const info = availability[session.id];
-        return !info || (info.isOpen && info.remaining > 0);
+        return !info || (!info.isCancelled && info.isOpen && info.remaining > 0);
       });
 
       return firstAvailable?.id ?? sessions[0].id;
@@ -385,6 +412,12 @@ function Formations() {
                   onErrorChange={setQuickError}
                   onLoadingChange={setQuickLoading}
                 />
+                <p className="mt-4 text-xs text-white/60 sm:text-sm">
+                  Un imprévu ? Vous pourrez modifier votre réservation plus tard via{" "}
+                  <Link to="/reservations" className="font-semibold text-brand-gold hover:underline">
+                    l&apos;espace dédié
+                  </Link>.
+                </p>
                 {availabilityLoading && (
                   <p className="mt-3 text-xs text-white/60 sm:text-sm">
                     Actualisation des disponibilités en cours…
@@ -433,7 +466,12 @@ function Formations() {
         <p className="mx-auto mt-12 max-w-6xl px-4 text-center text-sm text-red-300 sm:text-base lg:max-w-7xl">{error}</p>
       )}
 
-      <ReservationModal isOpen={isModalOpen} onClose={closeModal} formation={selectedFormation} />
+      <ReservationModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        formation={selectedFormation}
+        availability={availability}
+      />
     </div>
   );
 }

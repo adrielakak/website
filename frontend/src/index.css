@@ -6,6 +6,11 @@
   color-scheme: dark;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   font-family: "Inter", "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background-color: #080b16;

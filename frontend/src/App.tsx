@@ -7,6 +7,7 @@ import Contact from "./pages/Contact";
 import Formations from "./pages/Formations";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
+import ManageReservation from "./pages/ManageReservation";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -28,6 +29,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/formations" element={<Formations />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/reservations" element={<ManageReservation />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
       </main>
