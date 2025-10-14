@@ -1,9 +1,9 @@
 import { Router } from "express";
 import Stripe from "stripe";
-
 import { formations } from "../data/formations.js";
 import { getSessionAvailability } from "../services/availabilityService.js";
 import { addReservation, countActiveReservationsBySession } from "../services/reservationStorage.js";
+import { sendReservationConfirmationEmail } from "../services/emailService.js";
 
 const router = Router();
 
@@ -66,7 +66,7 @@ router.post("/create-checkout-session", async (req, res) => {
 
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeSecretKey) {
-    return res.status(500).json({ message: "La clé Stripe n'est pas configurée." });
+    return res.status(500).json({ message: "Clé Stripe non configurée." });
   }
 
   const formation = formations.find((item) => item.id === formationId);
@@ -76,7 +76,7 @@ router.post("/create-checkout-session", async (req, res) => {
 
   const sessionOption = formation.sessions.find((session) => session.id === sessionId);
   if (!sessionOption) {
-    return res.status(404).json({ message: "Session sélectionnée introuvable." });
+    return res.status(404).json({ message: "Session introuvable." });
   }
 
   const envKey = `STRIPE_PRICE_ID_${formationId.replace(/[^a-zA-Z0-9]/g, "_").toUpperCase()}`;
@@ -109,6 +109,7 @@ router.post("/create-checkout-session", async (req, res) => {
 
   try {
     const successBase = resolveClientBaseUrl();
+
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: customerEmail,
@@ -120,7 +121,7 @@ router.post("/create-checkout-session", async (req, res) => {
       billing_address_collection: "auto",
     });
 
-    await addReservation({
+    const reservation = await addReservation({
       customerName,
       customerEmail,
       formationId,
@@ -131,6 +132,20 @@ router.post("/create-checkout-session", async (req, res) => {
       status: "stripe_pending",
       stripeSessionId: checkoutSession.id,
     });
+
+    try {
+      await sendReservationConfirmationEmail({
+        reservation: {
+          ...reservation,
+          location: formation.location || "Ateliers Théâtre de Nantes — Centre-ville",
+        },
+        paymentStatus: "pending",
+      });
+
+      console.log(`Email envoyé à ${customerEmail} pour la réservation ${reservation.id}`);
+    } catch (mailError) {
+      console.error("Erreur lors de l'envoi du mail Stripe :", mailError);
+    }
 
     return res.json({ url: checkoutSession.url });
   } catch (error) {

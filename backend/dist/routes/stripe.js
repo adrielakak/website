@@ -129,7 +129,7 @@ router.post("/create-checkout-session", async (req, res) => {
       stripeSessionId: checkoutSession.id,
     });
 
-    // 🔔 Envoi automatique du mail de confirmation
+    // Envoi automatique du mail de confirmation
     try {
       await sendReservationConfirmationEmail({
         reservation: {
@@ -139,7 +139,7 @@ router.post("/create-checkout-session", async (req, res) => {
         paymentStatus: "pending",
       });
 
-      console.log(`✅ E-mail de confirmation envoyé à ${customerEmail}`);
+      console.log(`E-mail de confirmation envoyé à ${customerEmail}`);
     } catch (mailError) {
       console.error("❌ Erreur lors de l'envoi du mail :", mailError);
     }

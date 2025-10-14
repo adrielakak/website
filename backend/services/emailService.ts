@@ -1,16 +1,41 @@
 import nodemailer from "nodemailer";
 
-import type { ReservationRecord } from "./reservationStorage.js";
+/* -----------------------------------------------------------
+   Types utilisés pour mieux encadrer la fonction
+----------------------------------------------------------- */
+interface ReservationRecord {
+  id: string;
+  createdAt: string;
+  customerName: string;
+  customerEmail: string;
+  formationId: string;
+  formationTitle: string;
+  sessionId: string;
+  sessionLabel: string;
+  paymentMethod: string;
+  status: string;
+  stripeSessionId?: string;
+}
 
+interface ConfirmationEmailPayload {
+  reservation: ReservationRecord & { location?: string };
+  paymentStatus: "pending" | "confirmed";
+  checkoutSessionUrl?: string;
+}
+
+/* -----------------------------------------------------------
+   Gestion du transport SMTP
+----------------------------------------------------------- */
 let transporter: nodemailer.Transporter | null = null;
 
-function buildTransporter(): nodemailer.Transporter | null {
+function buildTransporter() {
   const host = process.env.SMTP_HOST;
   const port = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
 
   if (!host || !port || !user || !pass) {
+    console.warn("Configuration SMTP incomplète : e-mails désactivés.");
     return null;
   }
 
@@ -18,84 +43,105 @@ function buildTransporter(): nodemailer.Transporter | null {
     host,
     port,
     secure: port === 465 || process.env.SMTP_SECURE === "true",
-    auth: {
-      user,
-      pass,
-    },
+    auth: { user, pass },
   });
 }
 
-function getTransporter(): nodemailer.Transporter | null {
+function getTransporter() {
   if (!transporter) {
     transporter = buildTransporter();
   }
   return transporter;
 }
 
-export function isEmailEnabled(): boolean {
+export function isEmailEnabled() {
   return Boolean(getTransporter() && process.env.EMAIL_FROM);
 }
 
-interface ConfirmationEmailPayload {
-  reservation: ReservationRecord;
-  paymentStatus: "pending" | "confirmed";
-  checkoutSessionUrl?: string;
-}
-
+/* -----------------------------------------------------------
+   Fonction principale d'envoi d'e-mail
+----------------------------------------------------------- */
 export async function sendReservationConfirmationEmail({
   reservation,
   paymentStatus,
   checkoutSessionUrl,
-}: ConfirmationEmailPayload): Promise<void> {
+}: ConfirmationEmailPayload) {
   const mailer = getTransporter();
   const from = process.env.EMAIL_FROM;
+
   if (!mailer || !from) {
-    console.warn("Email non envoyé : transporteur SMTP ou adresse expéditeur non configurés.");
+    console.warn("Email non envoyé : transporteur SMTP ou expéditeur non configurés.");
     return;
   }
 
   const adminCopy = process.env.EMAIL_NOTIFICATION_TO;
+
   const subject =
     paymentStatus === "confirmed"
-      ? `Confirmation paiement - ${reservation.formationTitle}`
-      : `Réservation en attente - ${reservation.formationTitle}`;
+      ? `Confirmation de paiement - ${reservation.formationTitle}`
+      : `Confirmation de réservation - ${reservation.formationTitle}`;
 
   const statusLabel =
     paymentStatus === "confirmed"
-      ? "Nous confirmons la bonne réception de votre paiement via Stripe."
-      : "Votre réservation est enregistrée. Le paiement sera confirmé dès validation.";
+      ? "Votre paiement a bien été reçu."
+      : "Votre réservation est enregistrée et en attente de validation du paiement.";
 
+  /* -----------------------------------------------------------
+     Version HTML de l'e-mail
+  ----------------------------------------------------------- */
   const html = `
-    <p>Bonjour ${reservation.customerName},</p>
-    <p>${statusLabel}</p>
-    <p><strong>Stage :</strong> ${reservation.formationTitle}</p>
-    <p><strong>Session :</strong> ${reservation.sessionLabel}</p>
-    <p><strong>Mode de paiement :</strong> ${reservation.paymentMethod === "stripe" ? "Carte bancaire (Stripe)" : "Virement bancaire"}</p>
-    ${
-      checkoutSessionUrl
-        ? `<p>Vous pouvez accéder au reçu Stripe depuis votre espace client : <a href="${checkoutSessionUrl}">${checkoutSessionUrl}</a></p>`
-        : ""
-    }
-    <p>À très bientôt !</p>
-    <p>— Ateliers Théâtre de Nantes</p>
+    <div style="font-family: Arial, sans-serif; color: #222; line-height: 1.6;">
+      <p>Bonjour <strong>${reservation.customerName}</strong>,</p>
+      <p>${statusLabel}</p>
+
+      <h3>Détails de votre réservation :</h3>
+      <ul>
+        <li><strong>Stage :</strong> ${reservation.formationTitle}</li>
+        <li><strong>Session :</strong> ${reservation.sessionLabel}</li>
+        <li><strong>Lieu :</strong> ${reservation.location || "Ateliers Théâtre de Nantes — Centre-ville"}</li>
+        <li><strong>ID de réservation :</strong> ${reservation.id}</li>
+        <li><strong>Mode de paiement :</strong> ${
+          reservation.paymentMethod === "stripe" ? "Carte bancaire (Stripe)" : "Virement bancaire"
+        }</li>
+      </ul>
+
+      ${
+        checkoutSessionUrl
+          ? `<p>Reçu Stripe : <a href="${checkoutSessionUrl}" target="_blank">${checkoutSessionUrl}</a></p>`
+          : ""
+      }
+
+      <p>Nous vous enverrons un rappel avant le début du stage.</p>
+      <p>À très bientôt !</p>
+      <p style="margin-top: 20px;">— <strong>Les Ateliers Théâtre de Nantes</strong></p>
+    </div>
   `;
 
-  const text = [
-    `Bonjour ${reservation.customerName},`,
-    "",
-    statusLabel,
-    "",
-    `Stage : ${reservation.formationTitle}`,
-    `Session : ${reservation.sessionLabel}`,
-    `Mode de paiement : ${reservation.paymentMethod === "stripe" ? "Carte bancaire (Stripe)" : "Virement bancaire"}`,
-    checkoutSessionUrl ? `Reçu Stripe : ${checkoutSessionUrl}` : "",
-    "",
-    "À très bientôt !",
-    "— Ateliers Théâtre de Nantes",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  /* -----------------------------------------------------------
+     Version texte brut (fallback)
+  ----------------------------------------------------------- */
+  const text = `
+Bonjour ${reservation.customerName},
 
+${statusLabel}
+
+Stage : ${reservation.formationTitle}
+Session : ${reservation.sessionLabel}
+Lieu : ${reservation.location || "Ateliers Théâtre de Nantes — Centre-ville"}
+ID de réservation : ${reservation.id}
+Mode de paiement : ${
+    reservation.paymentMethod === "stripe" ? "Carte bancaire (Stripe)" : "Virement bancaire"
+  }
+
+${checkoutSessionUrl ? `Reçu Stripe : ${checkoutSessionUrl}` : ""}
+
+À très bientôt !
+— Les Ateliers Théâtre de Nantes
+`;
+
+  /* -----------------------------------------------------------
+     Envoi de l'e-mail
+  ----------------------------------------------------------- */
   await mailer.sendMail({
     from,
     to: reservation.customerEmail,
@@ -104,4 +150,6 @@ export async function sendReservationConfirmationEmail({
     text,
     html,
   });
+
+  console.log(`Email envoyé à ${reservation.customerEmail}`);
 }
