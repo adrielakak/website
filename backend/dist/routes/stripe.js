@@ -7,9 +7,9 @@ import { addReservation, countActiveReservationsBySession } from "../services/re
 
 const router = Router();
 
-/* -------------------------------
+/* ----------------------------------------------------------
    UTILITAIRES STRIPE
---------------------------------- */
+---------------------------------------------------------- */
 function resolveLineItems(formation, sessionLabel, configuredValue) {
   const cleanedValue = configuredValue?.trim();
   if (cleanedValue) {
@@ -33,6 +33,7 @@ function resolveLineItems(formation, sessionLabel, configuredValue) {
       ];
     }
   }
+
   return [
     {
       quantity: 1,
@@ -53,13 +54,13 @@ function resolveClientBaseUrl() {
   return raw.trim().replace(/\/+$/, "");
 }
 
-/* -------------------------------
-   ROUTE PRINCIPALE : CRÉATION DE SESSION STRIPE
---------------------------------- */
+/* ----------------------------------------------------------
+   ROUTE : CRÉATION DE SESSION STRIPE
+---------------------------------------------------------- */
 router.post("/create-checkout-session", async (req, res) => {
   const { customerName, customerEmail, formationId, sessionId } = req.body ?? {};
 
-  // Validation de base
+  // Vérification des champs requis
   if (!customerName || !customerEmail || !formationId || !sessionId) {
     return res.status(400).json({ message: "Informations de réservation incomplètes." });
   }
@@ -74,7 +75,7 @@ router.post("/create-checkout-session", async (req, res) => {
     return res.status(404).json({ message: "Formation introuvable." });
   }
 
-  const sessionOption = formation.sessions.find((session) => session.id === sessionId);
+  const sessionOption = formation.sessions.find((s) => s.id === sessionId);
   if (!sessionOption) {
     return res.status(404).json({ message: "Session sélectionnée introuvable." });
   }
@@ -82,7 +83,6 @@ router.post("/create-checkout-session", async (req, res) => {
   const envKey = `STRIPE_PRICE_ID_${formationId.replace(/[^a-zA-Z0-9]/g, "_").toUpperCase()}`;
   const lineItems = resolveLineItems(formation, sessionOption.label, process.env[envKey]);
 
-  // Vérifie la disponibilité
   const [availability, activeCount] = await Promise.all([
     getSessionAvailability(sessionId),
     countActiveReservationsBySession(sessionId),
@@ -98,7 +98,6 @@ router.post("/create-checkout-session", async (req, res) => {
     return res.status(409).json({ message: "Cette session est complète. Merci de choisir une autre date." });
   }
 
-  // Crée la session Stripe
   const stripe = new Stripe(stripeSecretKey);
   const metadata = { formationId, sessionId, customerName, customerEmail };
 
@@ -116,7 +115,7 @@ router.post("/create-checkout-session", async (req, res) => {
       billing_address_collection: "auto",
     });
 
-    // Enregistre la réservation
+    // Ajoute la réservation côté backend
     const reservation = await addReservation({
       customerName,
       customerEmail,
@@ -129,7 +128,7 @@ router.post("/create-checkout-session", async (req, res) => {
       stripeSessionId: checkoutSession.id,
     });
 
-    // Envoi automatique du mail de confirmation
+    // Envoi automatique d’un e-mail de confirmation
     try {
       await sendReservationConfirmationEmail({
         reservation: {
@@ -139,16 +138,16 @@ router.post("/create-checkout-session", async (req, res) => {
         paymentStatus: "pending",
       });
 
-      console.log(`E-mail de confirmation envoyé à ${customerEmail}`);
+      console.log(`[MAIL] Confirmation envoyée à ${customerEmail} pour réservation ${reservation.id}`);
     } catch (mailError) {
-      console.error("❌ Erreur lors de l'envoi du mail :", mailError);
+      console.error("[MAIL] Erreur d’envoi :", mailError);
     }
 
-    // Renvoie l'URL Stripe au frontend
+    // Retourne l’URL Stripe pour redirection frontend
     return res.json({ url: checkoutSession.url });
   } catch (error) {
-    console.error("Erreur Stripe:", error);
-    return res.status(500).json({ message: "Impossible de créer la session de paiement Stripe." });
+    console.error("[STRIPE] Erreur :", error);
+    return res.status(500).json({ message: "Impossible de créer la session Stripe." });
   }
 });
 
