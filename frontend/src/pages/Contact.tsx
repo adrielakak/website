@@ -121,8 +121,8 @@ function Contact() {
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
               <p className="text-sm font-semibold text-white/70">Téléphone</p>
-              <a href="tel:+33652897410" className="mt-2 block text-lg font-semibold text-white hover:text-brand-gold">
-                06 52 89 74 10
+              <a href="tel:+33609425911" className="mt-2 block text-lg font-semibold text-white hover:text-brand-gold">
+                06 09 42 59 11
               </a>
             </div>
           </div>
