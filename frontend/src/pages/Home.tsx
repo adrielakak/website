@@ -68,7 +68,8 @@ function Home() {
                 Ateliers Theatre de Nantes
               </p>
               <h1 className="text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl">
-                Formations de theatre pour tous les niveaux, portées par Nathalie Karsenti.
+                Sessions week-end de 12 heures 
+                <br />stage intensif (théâtre & doublage) de Nathalie Karsenti
               </h1>
               <p className="max-w-2xl text-base text-white/70">
                 Nathalie Karsenti vous accompagnent dans le jeu d'acteur, l'improvisation et le doublage. Un cadre exigeant et bienveillant pour explorer votre voix, votre présence et votre créativité.
