@@ -5,8 +5,8 @@ import AnimatedContent from "../components/reactbits/AnimatedContent";
 
 const carouselItems = [
   {
-    src: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=1600&auto=format&fit=crop",
-    alt: "Stage de theatre - travail de groupe",
+    src: "https://sl.bing.net/i42pKHAbYvQ",
+    alt: "Nathalie Karsenti",
     legend: "Improvisations collectives pour libérer l'écoute et la confiance.",
   },
   {
