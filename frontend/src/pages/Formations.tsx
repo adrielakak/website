@@ -368,10 +368,10 @@ function Formations() {
               <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div className="max-w-xl">
                   <h2 className="text-2xl font-semibold text-white sm:text-3xl">
-                    Calendrier des stages Theatre &amp; Initiation doublage
+                    Calendrier des stages Théâtre &amp; Initiation doublage
                   </h2>
                   <p className="mt-3 text-sm text-white/70 sm:text-base">
-                    Toutes les sessions proposees par Nathalie Karsenti a Nantes. Places limitees a 12 personnes par week-end, confirmation definitive apres paiement.
+                    Toutes les sessions proposées par Nathalie Karsenti à Nantes. Places limitées à 16 personnes par week-end. Confirmation définitive après paiement.
                   </p>
                 </div>
                 <div className="inline-flex max-w-full items-center justify-center rounded-2xl border border-brand-primary/30 bg-brand-primary/20 px-5 py-3 text-sm font-semibold text-brand-gold shadow-glow sm:text-base">
@@ -396,7 +396,7 @@ function Formations() {
               <div className="mt-10 rounded-2xl border border-brand-primary/20 bg-brand-primary/10 p-5 sm:p-6">
                 <h3 className="text-lg font-semibold text-white sm:text-xl">Paiement rapide par carte (Stripe)</h3>
                 <p className="mt-2 text-sm text-white/70 sm:text-base">
-                  Remplissez ce formulaire pour saisir vos informations et confirmer le paiement sécurisé via Stripe.
+                  Remplissez ce formulaire pour saisir vos informations et confirmez le paiement sécurisé via Stripe.
                 </p>
                 <QuickStripeCheckoutForm
                   formation={stageIntensif}
