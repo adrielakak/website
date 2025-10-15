@@ -23,15 +23,15 @@ const carouselItems = [
 
 const experienceHighlights = [
   {
-    title: "Voix officielle de Zoe Saldana",
+    title: "Voix officielle de Gamora",
     text: "Gamora dans l'univers Marvel (Gardiens de la Galaxie, Avengers), mais aussi Eva Mendes, January Jones, Marisol Nichols, Shawnee Smith et bien d'autres actrices américaines.",
   },
   {
-    title: "Pedagogie du Cours Florent",
+    title: "Professeur au Cours Florent",
     text: "Diplômée du Conservatoire de Nantes et du Cours Florent, Nathalie y enseigne depuis plus de 5 ans et transmet une méthode basée sur l'exigence bienveillante.",
   },
   {
-    title: "Créatrice de l'émission Il était une voix",
+    title: "Créatrice et animatrice de l'émission Il était une voix",
     text: "Un rendez-vous dédié au doublage et aux voix françaises, qui met en lumière le travail des comédiennes et comédiens de l'ombre.",
   },
 ];
