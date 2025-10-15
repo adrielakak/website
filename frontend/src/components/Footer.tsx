@@ -13,7 +13,7 @@ function Footer() {
           <a href="mailto:nk26fr@gmail.com" className="inline-flex items-center gap-2 text-white hover:text-brand-gold">
             nk26fr@gmail.com
           </a>
-          <p className="mt-1 text-white/70">Tél. : 06 52 89 74 10</p>
+          <p className="mt-1 text-white/70">Tél. : 06 09 42 59 11</p>
           <Link
             to="/reservations"
             className="inline-flex items-center gap-2 text-white hover:text-brand-gold"
