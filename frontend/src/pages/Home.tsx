@@ -5,7 +5,7 @@ import AnimatedContent from "../components/reactbits/AnimatedContent";
 
 const carouselItems = [
   {
-    src: "https://sl.bing.net/i42pKHAbYvQ",
+    src: "https://media.ouest-france.fr/v1/pictures/MjAyMzEwZjg2ZTZlOGU3MTAxZTZmNDc5ZmVkYmQ4OTVkMjQxNDg?width=1260&height=708&focuspoint=50%2C25&cropresize=1&client_id=bpeditorial&sign=d86ba900be5d75e0e7a1b1bcad5ab8690bc2c3f0dad65fc2a06e7d35ce9d950b",
     alt: "Nathalie Karsenti",
     legend: "Improvisations collectives pour libérer l'écoute et la confiance.",
   },
@@ -167,7 +167,7 @@ function Home() {
                   Groupes limités, retours individualisés, travail corporel, vocal et scénique : chaque parcours est pensé pour faire grandir votre confiance.
                 </p>
                 <ul className="mt-5 space-y-3 text-sm text-white/65">
-                  <li>• Maximum 12 participant·es par session</li>
+                  <li>• Maximum 16 participant·es par session</li>
                   <li>• Exercices adaptés à votre progression</li>
                   <li>• Initiation professionnelle au doublage</li>
                   <li>• Coaching individuel et collectif</li>
@@ -182,7 +182,7 @@ function Home() {
                   <li>• Samedi 13h30-19h30 / Dimanche 10h00-13h00 puis 14h00-17h00</li>
                   <li>• A partir de 16 ans – aucun niveau requis</li>
                   <li>• Réservation : nk26fr@gmail.com</li>
-                  <li>• Téléphone : 06 52 89 74 10</li>
+                  <li>• Téléphone : 06 09 42 59 11</li>
                   <li>• Paiement : Stripe (carte bancaire) ou virement</li>
                 </ul>
               </div>
