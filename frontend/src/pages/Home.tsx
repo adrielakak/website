@@ -72,7 +72,7 @@ function Home() {
                 stages intensifs (théâtre & doublage) de Nathalie Karsenti
               </h1>
               <p className="max-w-2xl text-base text-white/70">
-                Nathalie Karsenti vous accompagnent dans le jeu d'acteur, l'improvisation et le doublage. Un cadre exigeant et bienveillant pour explorer votre voix, votre présence et votre créativité.
+                Nathalie Karsenti vous accompagne dans le jeu d'acteur, l'improvisation et le doublage. Un cadre exigeant et bienveillant pour explorer votre voix, votre présence et votre créativité.
               </p>
               <div className="flex flex-wrap items-center gap-4">
                 <Link to="/formations" className="btn-primary">
@@ -144,13 +144,16 @@ function Home() {
               </p>
               <div className="mt-9 space-y-5 text-white/65">
                 <p>
-                  Les Ateliers Théâtre de Nantes réunissent comédiennes, pédagogues et voix professionnelles. L'objectif : oser, se surprendre et transformer la scène en terrain de jeu.
+                  L'objectif : oser, se surprendre et transformer la scène en terrain de jeu.
                 </p>
                 <p>
                   Nathalie Karsenti accompagne toutes celles et ceux qui souhaitent approfondir leur jeu, affirmer leur présence scénique et découvrir l'univers du doublage.
                 </p>
                 <p>
                   Les groupes sont volontairement limités pour offrir des retours personnalisés. Aucun prérequis : les ateliers s'adaptent à votre niveau et vos envies.
+                </p>
+                <p>
+                  Vous désirez gagner en confiance, le stage de Nathalie est fait pour vous. Il s'adresse aussi bien aux comédiens, qu'aux chefs d'entreprises, qu'aux professeurs. A toutes celles et ceux qui doivent performer en public.
                 </p>
               </div>
             </div>
