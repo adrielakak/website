@@ -76,7 +76,7 @@ function Home() {
               </p>
               <div className="flex flex-wrap items-center gap-4">
                 <Link to="/formations" className="btn-primary">
-                  Réserver une formation
+                  Réservez une formation
                 </Link>
                 <Link
                   to="/contact"
