@@ -109,7 +109,7 @@ function Home() {
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                      <span>Ecriture de dialogues et interprétation en duo</span>
+                      <span>Ecriture de dialogues et interprétation en duo et en groupe</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
@@ -117,7 +117,7 @@ function Home() {
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                      <span>4 heures de découverte du doublage en conditions réelles</span>
+                      <span>5 heures de découverte du doublage en conditions réelles</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
