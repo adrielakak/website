@@ -5,7 +5,7 @@ import AnimatedContent from "../components/reactbits/AnimatedContent";
 
 const carouselItems = [
   {
-    src: "https://media.ouest-france.fr/v1/pictures/MjAyMzEwZjg2ZTZlOGU3MTAxZTZmNDc5ZmVkYmQ4OTVkMjQxNDg?width=1260&height=708&focuspoint=50%2C25&cropresize=1&client_id=bpeditorial&sign=d86ba900be5d75e0e7a1b1bcad5ab8690bc2c3f0dad65fc2a06e7d35ce9d950b",
+    src: "https://fr.web.img3.acsta.net/img/8d/91/8d9128f0fddeaea82158bce554ba197b.jpg",
     alt: "Nathalie Karsenti",
     legend: "Improvisations collectives pour libérer l'écoute et la confiance.",
   },
