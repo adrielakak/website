@@ -68,7 +68,7 @@ function Home() {
                 Ateliers Theatre de Nantes
               </p>
               <h1 className="text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl">
-                Sessions week-end de 12 h 
+                Sessions week-end de 12H 
                 stages intensifs (théâtre & doublage) de Nathalie Karsenti
               </h1>
               <p className="max-w-2xl text-base text-white/70">
