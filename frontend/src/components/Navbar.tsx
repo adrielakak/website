@@ -44,7 +44,7 @@ function Navbar() {
             AT
           </span>
           <div className="leading-tight text-white/80">
-            <span className="tracking-wide">Ateliers Théâtre et doublage</span>
+            <span className="tracking-wide">Ateliers Théâtre & doublage</span>
             <span className="block text-xs font-normal uppercase text-white/50">Nantes</span>
           </div>
         </Link>
