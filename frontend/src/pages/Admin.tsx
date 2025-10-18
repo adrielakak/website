@@ -75,6 +75,12 @@ function Admin() {
   const [nkFile, setNkFile] = useState<File | null>(null);
   const [editNewsId, setEditNewsId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  // Actives = visibles et comptées dans les sessions
+  const ACTIVE_RES_STATUS: AdminReservationStatus[] = [
+    "stripe_pending",
+    "stripe_confirmed",
+    "virement_en_attente",
+  ];
 
   const [newSessionFormationId, setNewSessionFormationId] = useState("");
   const [newSessionLabel, setNewSessionLabel] = useState("");
@@ -333,14 +339,20 @@ const updateAvailability = async (
 
   const sessionsWithParticipants = useMemo(() => {
     const participantsBySession = reservations.reduce<Record<string, AdminReservation[]>>((acc, reservation) => {
-      acc[reservation.sessionId] = acc[reservation.sessionId] ?? [];
-      acc[reservation.sessionId].push(reservation);
+      // N'afficher que les réservations actives (exclut "cancelled")
+      if (ACTIVE_RES_STATUS.includes(reservation.status)) {
+        acc[reservation.sessionId] = acc[reservation.sessionId] ?? [];
+        acc[reservation.sessionId].push(reservation);
+      }
       return acc;
     }, {});
 
     return availability.map((session) => {
       const participants = participantsBySession[session.sessionId] ?? [];
-      const percent = session.capacity === 0 ? 0 : Math.min(100, Math.round((session.reservedCount / session.capacity) * 100));
+      const percent =
+        session.capacity === 0
+          ? 0
+          : Math.min(100, Math.round((session.reservedCount / session.capacity) * 100));
       return {
         ...session,
         participants,
@@ -653,8 +665,26 @@ const updateAvailability = async (
                 className="mt-2 block w-full text-xs text-white/70 file:mr-3 file:rounded-lg file:border file:border-white/15 file:bg-white/[0.06] file:px-3 file:py-2 file:text-white hover:file:bg-white/[0.1]"
               />
               {isUploading && <p className="mt-1 text-xs text-white/60">Televersement en cours...</p>}
-            </div><div className="flex items-end">
-              <button type="submit" className="btn-primary">Publier</button>
+            </div>
+            <div className="flex items-end gap-3">
+              <button type="submit" className="btn-primary">
+                {editNewsId ? "Mettre à jour" : "Publier"}
+              </button>
+              {editNewsId && (
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => {
+                    setNkTitle("");
+                    setNkContent("");
+                    setNkImage("");
+                    setNkFile(null);
+                    setEditNewsId(null);
+                  }}
+                >
+                  Annuler
+                </button>
+              )}
             </div>
           </form>
           <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -667,6 +697,25 @@ const updateAvailability = async (
                   {item.createdAt && (
                     <p className="mt-2 text-xs text-white/50">{new Date(item.createdAt).toLocaleString("fr-FR")}</p>
                   )}
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      className="btn-secondary text-xs uppercase tracking-[0.3em]"
+                      onClick={() => handleNewsEdit(item)}
+                    >
+                      Modifier
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-full border border-red-500/40 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-red-200 transition hover:bg-red-500/10"
+                      onClick={() => handleNewsDelete(item.id)}
+                    >
+                      Supprimer
+                    </button>
+                    {editNewsId === item.id && (
+                      <span className="ml-2 text-[11px] text-brand-gold">(édition en cours)</span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
