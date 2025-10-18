@@ -505,7 +505,7 @@ const updateAvailability = async (
                           }
                           disabled={isSaving}
                         >
-                          {session.isCancelled ? "Réactiver la session" : "Annuler la session"}
+                          {session.isCancelled ? "Réactiver la session" : "Annuléer la session"}
                         </button>
                       </div>
                     </div>
@@ -920,6 +920,9 @@ const updateAvailability = async (
 }
 
 export default Admin;
+
+
+
 
 
 

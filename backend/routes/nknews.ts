@@ -1,14 +1,15 @@
-import { Router } from "express";
-import fs from "fs";
-import path from "path";
+﻿import { Router } from "express";
+import fs from "fs-extra";
+import { resolveDataPath } from "../services/storagePaths.js";
 
 const router = Router();
-const filePath = path.join(process.cwd(), "data", "nknews.json");
+const filePath = resolveDataPath("nknews.json");
 
-router.get("/", (_req, res) => {
+router.get("/", async (_req, res) => {
   try {
-    if (!fs.existsSync(filePath)) return res.json([]);
-    const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    const exists = await fs.pathExists(filePath);
+    if (!exists) return res.json([]);
+    const data = JSON.parse(await fs.readFile(filePath, "utf-8"));
     return res.json(Array.isArray(data) ? data : []);
   } catch (e) {
     console.error("Erreur lecture NKNEWS:", e);
@@ -16,7 +17,7 @@ router.get("/", (_req, res) => {
   }
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   const configuredKey = process.env.ADMIN_API_KEY;
   const providedKey = req.header("x-admin-key");
   if (configuredKey && providedKey !== configuredKey) {
@@ -31,17 +32,17 @@ router.post("/", (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
+    const exists = await fs.pathExists(filePath);
     let articles: unknown = [];
-    if (fs.existsSync(filePath)) {
-      articles = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    if (exists) {
+      articles = JSON.parse(await fs.readFile(filePath, "utf-8"));
     } else {
-      const dir = path.dirname(filePath);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      await fs.ensureFile(filePath);
     }
 
     const list = Array.isArray(articles) ? articles : [];
     list.unshift(entry);
-    fs.writeFileSync(filePath, JSON.stringify(list, null, 2));
+    await fs.writeFile(filePath, JSON.stringify(list, null, 2), "utf-8");
     return res.json({ success: true });
   } catch (e) {
     console.error("Erreur écriture NKNEWS:", e);
