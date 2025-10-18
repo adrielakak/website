@@ -95,4 +95,4 @@ Backend : http://localhost:4000
 ## Credit
 
 Animations adaptees depuis [ReactBits.dev](https://reactbits.dev) (MIT).  
-Developpement : Ateliers Theatre de Nantes by Adriel
+Developpement : Ateliers Theatre de Nantes by Adriel with love 💜
