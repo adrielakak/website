@@ -1,4 +1,4 @@
-﻿?import { FormEvent, useMemo, useState } from "react";
+﻿import { FormEvent, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import AnimatedContent from "../components/reactbits/AnimatedContent";
@@ -385,7 +385,7 @@ function ManageReservation() {
               </form>
 
                             <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-4 text-xs text-white/60 sm:text-sm">
-                Besoin de reporter une deuxième fois, d&apos;annuler ou de demander un remboursement ? Utilisez le
+                Besoin de reporter une deuxième fois, d&apos;annuler ou de demander un remboursement ? utiliséez le
                 <Link to="/contact" className="font-semibold text-brand-gold hover:underline">formulaire de contact</Link>
                 ou appelez le <a className="font-semibold text-brand-gold hover:underline" href="tel:+33609425911">06 09 42 59 11</a>.
               </div>
@@ -398,6 +398,9 @@ function ManageReservation() {
 }
 
 export default ManageReservation;
+
+
+
 
 
 

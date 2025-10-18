@@ -411,7 +411,7 @@ const updateAvailability = async (
               const draftValue = capacityDrafts[session.sessionId] ?? session.capacity;
               const isSaving = savingSessionId === session.sessionId;
               const statusLabel = session.isCancelled
-                ? "Session annulée"
+                ? "Session Annulée"
                 : session.isOpen
                 ? "Session ouverte"
                 : "Session fermée";
@@ -444,7 +444,7 @@ const updateAvailability = async (
                       </div>
                       {session.isCancelled && (
                         <p className="mt-2 text-xs text-red-200">
-                          Session annulée : les nouvelles inscriptions et paiements sont bloqués.
+                          Session Annulée : les nouvelles inscriptions et paiements sont bloqués.
                         </p>
                       )}
                     </div>
@@ -655,7 +655,7 @@ const updateAvailability = async (
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             {sessionsWithParticipants.map((session) => {
               const statusLabel = session.isCancelled
-                ? "Session annulée"
+                ? "Session Annulée"
                 : session.isOpen
                 ? "Session ouverte"
                 : "Session fermée";
@@ -681,7 +681,7 @@ const updateAvailability = async (
                       </div>
                       {session.isCancelled && (
                         <p className="mt-2 text-xs text-red-200">
-                          Session annulée : pensez à prévenir les participants déjà inscrits.
+                          Session Annulée : pensez à prévenir les participants déjà inscrits.
                         </p>
                       )}
                     </div>
@@ -799,7 +799,7 @@ const updateAvailability = async (
                               >
                                 {option.sessionLabel}
                                 {option.isCancelled
-                                  ? " — annulée"
+                                  ? " — Annulée"
                                   : option.remaining <= 0
                                   ? " — complet"
                                   : ""}
@@ -904,7 +904,7 @@ const updateAvailability = async (
                     className="rounded-full border border-red-500/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-red-200 transition hover:bg-red-500/10"
                     onClick={() => handleContactDelete(message.id)}
                   >
-                    Supprimer
+                    supprimer
                   </button>
                 </div>
               </div>
@@ -920,6 +920,15 @@ const updateAvailability = async (
 }
 
 export default Admin;
+
+
+
+
+
+
+
+
+
 
 
 
