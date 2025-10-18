@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+﻿import nodemailer from "nodemailer";
 
 /* -----------------------------------------------------------
    Types utilisés pour mieux encadrer la fonction
@@ -17,8 +17,7 @@ interface ReservationRecord {
   stripeSessionId?: string;
 }
 
-interface ConfirmationEmailPayload {
-  reservation: ReservationRecord & { location?: string };
+interface ConfirmationEmailPayload {`n  reservation: ReservationRecord & { location?: string };`n  paymentStatus: "pending" | "confirmed";`n  checkoutSessionUrl?: string;`n  reason?: "new" | "changed";`n};
   paymentStatus: "pending" | "confirmed";
   checkoutSessionUrl?: string;
 }
@@ -61,11 +60,7 @@ export function isEmailEnabled() {
 /* -----------------------------------------------------------
    Fonction principale d'envoi d'e-mail
 ----------------------------------------------------------- */
-export async function sendReservationConfirmationEmail({
-  reservation,
-  paymentStatus,
-  checkoutSessionUrl,
-}: ConfirmationEmailPayload) {
+export async function sendReservationConfirmationEmail({`n  reservation,`n  paymentStatus,`n  checkoutSessionUrl,`n  reason = "new",`n}: ConfirmationEmailPayload) {
   const mailer = getTransporter();
   const from = process.env.EMAIL_FROM;
 
@@ -77,12 +72,16 @@ export async function sendReservationConfirmationEmail({
   const adminCopy = process.env.EMAIL_NOTIFICATION_TO;
 
   const subject =
-    paymentStatus === "confirmed"
+    reason === "changed"
+      ? `Changement de session enregistré - ${reservation.formationTitle}`
+      : paymentStatus === "confirmed"
       ? `Confirmation de paiement - ${reservation.formationTitle}`
       : `Confirmation de réservation - ${reservation.formationTitle}`;
 
   const statusLabel =
-    paymentStatus === "confirmed"
+    reason === "changed"
+      ? "Votre changement de session est confirmé."
+      : paymentStatus === "confirmed"
       ? "Votre paiement a bien été reçu."
       : "Votre réservation est enregistrée et en attente de validation du paiement.";
 
@@ -111,7 +110,7 @@ export async function sendReservationConfirmationEmail({
           : ""
       }
 
-      <p>Nous vous enverrons un rappel avant le début du stage.</p>
+      
       <p>À très bientôt !</p>
       <p style="margin-top: 20px;">— <strong>Les Ateliers Théâtre de Nantes</strong></p>
     </div>

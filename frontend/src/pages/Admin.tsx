@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+﻿import { FormEvent, useMemo, useState } from "react";
 
 import { apiClient } from "../lib/api";
 
@@ -49,10 +49,10 @@ const RESERVATION_STATUS_OPTIONS: AdminReservationStatus[] = [
 ];
 
 const RESERVATION_STATUS_LABELS: Record<AdminReservationStatus, string> = {
-  stripe_pending: "Stripe — en attente",
-  stripe_confirmed: "Stripe — confirmé",
-  virement_en_attente: "Virement — en attente",
-  cancelled: "Annulée",
+  stripe_pending: "Stripe â€” en attente",
+  stripe_confirmed: "Stripe â€” confirmÃ©",
+  virement_en_attente: "Virement â€” en attente",
+  cancelled: "AnnulÃ©e",
 };
 
 function Admin() {
@@ -72,6 +72,13 @@ function Admin() {
   const [nkTitle, setNkTitle] = useState("");
   const [nkContent, setNkContent] = useState("");
   const [nkImage, setNkImage] = useState("");
+  const [nkFile, setNkFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const [newSessionFormationId, setNewSessionFormationId] = useState("");
+  const [newSessionLabel, setNewSessionLabel] = useState("");
+  const [newSessionStart, setNewSessionStart] = useState("");
+  const [newSessionEnd, setNewSessionEnd] = useState("");
 
   const dateFormatter = useMemo(() => new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }), []);
 
@@ -117,7 +124,7 @@ function Admin() {
       setErrorMessage(null);
     } catch (error) {
       console.error("Erreur dashboard admin:", error);
-      setErrorMessage("Impossible d'accéder au tableau de bord. Vérifiez la clé administrateur.");
+      setErrorMessage("Impossible d'accÃ©der au tableau de bord. VÃ©rifiez la clÃ© administrateur.");
       setAdminKey(null);
     } finally {
       setIsLoading(false);
@@ -128,35 +135,85 @@ function Admin() {
     event.preventDefault();
     try {
       if (!adminKey) {
-        setErrorMessage("Connectez-vous d'abord avec la clé administrateur.");
+        setErrorMessage("Connectez-vous d'abord avec la clÃ© administrateur.");
         return;
       }
+      let imageUrl = nkImage.trim();
+      if (nkFile) {
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append("file", nkFile);
+        const uploadRes = await apiClient.post(
+          "/api/uploads/image",
+          formData,
+          { headers: { "x-admin-key": adminKey } }
+        );
+        imageUrl = uploadRes.data?.url ?? imageUrl;
+      }
+
       await apiClient.post(
         "/api/nknews",
         {
           title: nkTitle.trim(),
           content: nkContent.trim(),
-          image: nkImage.trim(),
+          image: imageUrl,
         },
         { headers: { "x-admin-key": adminKey } }
       );
       setNkTitle("");
       setNkContent("");
       setNkImage("");
+      setNkFile(null);
       const res = await apiClient.get<Array<{ title?: string; content?: string; image?: string; createdAt?: string }>>(
         "/api/nknews"
       );
       setNknews(res.data ?? []);
     } catch (e) {
       console.error("Erreur ajout NKNEWS:", e);
-      setErrorMessage("Impossible d'ajouter l'actualité.");
+      setErrorMessage("Impossible d'ajouter l'actualitÃ©.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const addSession = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!adminKey) {
+      setErrorMessage("Connectez-vous d'abord avec la clÃ© administrateur.");
+      return;
+    }
+    if (!newSessionFormationId || !newSessionLabel || !newSessionStart || !newSessionEnd) {
+      setErrorMessage("Veuillez remplir tous les champs de la nouvelle session.");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      await apiClient.post(
+        "/api/admin/sessions",
+        {
+          formationId: newSessionFormationId,
+          label: newSessionLabel,
+          startDate: newSessionStart,
+          endDate: newSessionEnd,
+        },
+        { headers: { "x-admin-key": adminKey } }
+      );
+      setNewSessionLabel("");
+      setNewSessionStart("");
+      setNewSessionEnd("");
+      await fetchDashboard(adminKey);
+    } catch (error) {
+      console.error("Erreur ajout session:", error);
+      setErrorMessage("Impossible d'ajouter la session.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!adminKeyInput.trim()) {
-      setErrorMessage("Merci de renseigner la clé administrateur.");
+      setErrorMessage("Merci de renseigner la clÃ© administrateur.");
       return;
     }
     await fetchDashboard(adminKeyInput.trim());
@@ -176,8 +233,8 @@ const updateAvailability = async (
     });
     await fetchDashboard(adminKey);
   } catch (error) {
-    console.error("Erreur mise à jour disponibilité:", error);
-    setErrorMessage("Impossible de mettre à jour la disponibilité. Réessayez plus tard.");
+    console.error("Erreur mise Ã  jour disponibilitÃ©:", error);
+    setErrorMessage("Impossible de mettre Ã  jour la disponibilitÃ©. RÃ©essayez plus tard.");
   } finally {
     setSavingSessionId(null);
   }
@@ -202,8 +259,8 @@ const updateAvailability = async (
       });
       await fetchDashboard(adminKey);
     } catch (error) {
-      console.error("Erreur mise à jour réservation:", error);
-      setErrorMessage("Impossible de mettre à jour la réservation. Réessayez plus tard.");
+      console.error("Erreur mise Ã  jour rÃ©servation:", error);
+      setErrorMessage("Impossible de mettre Ã  jour la rÃ©servation. RÃ©essayez plus tard.");
     } finally {
       setUpdatingReservationId(null);
     }
@@ -221,8 +278,8 @@ const updateAvailability = async (
       );
       await fetchDashboard(adminKey);
     } catch (error) {
-      console.error("Erreur mise à jour message:", error);
-      setErrorMessage("Impossible de mettre à jour le message. Réessayez plus tard.");
+      console.error("Erreur mise Ã  jour message:", error);
+      setErrorMessage("Impossible de mettre Ã  jour le message. RÃ©essayez plus tard.");
     }
   };
 
@@ -230,7 +287,7 @@ const updateAvailability = async (
     if (!adminKey) {
       return;
     }
-    const confirmation = window.confirm("Supprimer définitivement ce message ?");
+    const confirmation = window.confirm("Supprimer dÃ©finitivement ce message ?");
     if (!confirmation) {
       return;
     }
@@ -285,12 +342,12 @@ const updateAvailability = async (
         <div className="mx-auto max-w-md rounded-3xl border border-white/10 bg-white/[0.04] px-8 py-10 shadow-glow-soft">
           <h1 className="text-2xl font-semibold">Espace administrateur</h1>
           <p className="mt-3 text-sm text-white/70">
-            Entrez la clé fournie pour ajuster les disponibilités des stages et consulter les réservations en temps réel.
+            Entrez la clÃ© fournie pour ajuster les disponibilitÃ©s des stages et consulter les rÃ©servations en temps rÃ©el.
           </p>
           <form className="mt-8 space-y-4" onSubmit={handleLogin}>
             <div>
               <label className="block text-sm font-medium text-white" htmlFor="admin-key">
-                Clé administrateur
+                ClÃ© administrateur
               </label>
               <input
                 id="admin-key"
@@ -322,9 +379,9 @@ const updateAvailability = async (
         <header className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-3xl font-semibold">Tableau de bord — réservations</h1>
+              <h1 className="text-3xl font-semibold">Tableau de bord â€” rÃ©servations</h1>
               <p className="mt-2 text-sm text-white/70">
-                Ajustez les capacités, ouvrez ou fermez une session et visualisez toutes les inscriptions confirmées ou en attente.
+                Ajustez les capacitÃ©s, ouvrez ou fermez une session et visualisez toutes les inscriptions confirmÃ©es ou en attente.
               </p>
             </div>
             <div className="rounded-2xl border border-brand-primary/40 bg-brand-primary/20 px-5 py-3 text-sm font-semibold text-brand-gold">
@@ -345,7 +402,7 @@ const updateAvailability = async (
         </header>
 
         <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
-          <h2 className="text-2xl font-semibold">Gestion des disponibilités</h2>
+          <h2 className="text-2xl font-semibold">Gestion des disponibilitÃ©s</h2>
           <p className="mt-2 text-sm text-white/65">
             Modifiez le nombre de places ou fermez temporairement une session pour bloquer les paiements.
           </p>
@@ -354,10 +411,10 @@ const updateAvailability = async (
               const draftValue = capacityDrafts[session.sessionId] ?? session.capacity;
               const isSaving = savingSessionId === session.sessionId;
               const statusLabel = session.isCancelled
-                ? "Session annulée"
+                ? "Session annulÃ©e"
                 : session.isOpen
                 ? "Session ouverte"
-                : "Session fermée";
+                : "Session fermÃ©e";
               const statusClasses = session.isCancelled
                 ? "border-red-500/40 bg-red-500/15 text-red-200"
                 : session.isOpen
@@ -375,7 +432,7 @@ const updateAvailability = async (
                       <h3 className="text-xl font-semibold text-white">{session.formationTitle}</h3>
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-white/60">
                         <span>
-                          Réservations confirmées ou en attente&nbsp;: {session.reservedCount} &nbsp;•&nbsp; Restant&nbsp;:
+                          RÃ©servations confirmÃ©es ou en attente&nbsp;: {session.reservedCount} &nbsp;â€¢&nbsp; Restant&nbsp;:
                           {" "}
                           {session.remaining}
                         </span>
@@ -387,13 +444,13 @@ const updateAvailability = async (
                       </div>
                       {session.isCancelled && (
                         <p className="mt-2 text-xs text-red-200">
-                          Session annulée : les nouvelles inscriptions et paiements sont bloqués.
+                          Session annulÃ©e : les nouvelles inscriptions et paiements sont bloquÃ©s.
                         </p>
                       )}
                     </div>
                     <div className="flex flex-col gap-3 md:w-80">
                       <label className="text-xs font-semibold uppercase tracking-[0.3em] text-white/60" htmlFor={`capacity-${session.sessionId}`}>
-                        Capacité
+                        CapacitÃ©
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -415,7 +472,7 @@ const updateAvailability = async (
                           disabled={isSaving}
                           onClick={() => updateAvailability(session.sessionId, { capacity: draftValue })}
                         >
-                          {isSaving ? "Enregistrement..." : "Mettre à jour"}
+                          {isSaving ? "Enregistrement..." : "Mettre Ã  jour"}
                         </button>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -448,7 +505,7 @@ const updateAvailability = async (
                           }
                           disabled={isSaving}
                         >
-                          {session.isCancelled ? "Réactiver la session" : "Annuler la session"}
+                          {session.isCancelled ? "RÃ©activer la session" : "Annuler la session"}
                         </button>
                       </div>
                     </div>
@@ -457,14 +514,79 @@ const updateAvailability = async (
               );
             })}
             {availability.length === 0 && !isLoading && (
-              <p className="text-sm text-white/60">Aucune session trouvée.</p>
+              <p className="text-sm text-white/60">Aucune session trouvÃ©e.</p>
             )}
           </div>
         </section>
 
         <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
+          <h2 className="text-2xl font-semibold">Ajouter une session</h2>
+          <p className="mt-2 text-sm text-white/65">CrÃ©ez une nouvelle date pour une formation existante.</p>
+          <form className="mt-6 grid gap-4 md:grid-cols-4" onSubmit={addSession}>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-[0.3em] text-white/60">Formation</label>
+              <select
+                value={newSessionFormationId}
+                onChange={(e) => setNewSessionFormationId(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                required
+              >
+                <option value="" disabled>
+                  SÃ©lectionner
+                </option>
+                {Array.from(new Map(availability.map((s) => [s.formationId, s.formationTitle])).entries()).map(
+                  ([id, title]) => (
+                    <option key={id} value={id}>
+                      {title}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold uppercase tracking-[0.3em] text-white/60">IntitulÃ©</label>
+              <input
+                value={newSessionLabel}
+                onChange={(e) => setNewSessionLabel(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                placeholder="Session week-end : 12 & 13 dÃ©cembre 2025"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-[0.3em] text-white/60">DÃ©but</label>
+              <input
+                type="date"
+                value={newSessionStart}
+                onChange={(e) => setNewSessionStart(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-[0.3em] text-white/60">Fin</label>
+              <input
+                type="date"
+                value={newSessionEnd}
+                onChange={(e) => setNewSessionEnd(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                required
+              />
+            </div>
+            <div className="md:col-span-4 flex items-center gap-3">
+              <button type="submit" className="btn-primary" disabled={isLoading}>
+                {isLoading ? "Ajout en cours..." : "Ajouter la session"}
+              </button>
+              <span className="text-xs text-white/50">
+                La session sera automatiquement ouverte avec la capacitÃ© par dÃ©faut.
+              </span>
+            </div>
+          </form>
+        </section>
+
+        <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
           <h2 className="text-2xl font-semibold">NKNEWS</h2>
-          <p className="mt-2 text-sm text-white/65">Publiez une brève (titre, texte, URL d'image).</p>
+          <p className="mt-2 text-sm text-white/65">Publiez une brève (titre, texte, URL d'image ou upload).</p>
           <form className="mt-6 grid gap-4 md:grid-cols-3" onSubmit={addNknews}>
             <div>
               <label className="block text-xs font-semibold uppercase tracking-[0.3em] text-white/60">Titre</label>
@@ -472,7 +594,7 @@ const updateAvailability = async (
                 value={nkTitle}
                 onChange={(e) => setNkTitle(e.target.value)}
                 className="mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
-                placeholder="Titre de l'actualité"
+                placeholder="Titre de l'actualitÃ©"
               />
             </div>
             <div className="md:col-span-2">
@@ -481,7 +603,7 @@ const updateAvailability = async (
                 value={nkContent}
                 onChange={(e) => setNkContent(e.target.value)}
                 className="mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
-                placeholder="Contenu de l'actualité"
+                placeholder="Contenu de l'actualitÃ©"
               />
             </div>
             <div className="md:col-span-2">
@@ -493,7 +615,16 @@ const updateAvailability = async (
                 placeholder="https://..."
               />
             </div>
-            <div className="flex items-end">
+                        <div>
+              <label className="block text-xs font-semibold uppercase tracking-[0.3em] text-white/60">ou Uploader une image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setNkFile(e.target.files?.[0] ?? null)}
+                className="mt-2 block w-full text-xs text-white/70 file:mr-3 file:rounded-lg file:border file:border-white/15 file:bg-white/[0.06] file:px-3 file:py-2 file:text-white hover:file:bg-white/[0.1]"
+              />
+              {isUploading && <p className="mt-1 text-xs text-white/60">Televersement en cours...</p>}
+            </div><div className="flex items-end">
               <button type="submit" className="btn-primary">Publier</button>
             </div>
           </form>
@@ -511,7 +642,7 @@ const updateAvailability = async (
               </div>
             ))}
             {nknews.length === 0 && (
-              <p className="text-white/60">Aucune actualité publiée.</p>
+              <p className="text-white/60">Aucune actualitÃ© publiÃ©e.</p>
             )}
           </div>
         </section>
@@ -519,15 +650,15 @@ const updateAvailability = async (
         <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
           <h2 className="text-2xl font-semibold">Remplissage des sessions</h2>
           <p className="mt-2 text-sm text-white/65">
-            Visualisez l&apos;occupation de chaque session et les participants déjà inscrits.
+            Visualisez l&apos;occupation de chaque session et les participants dÃ©jÃ  inscrits.
           </p>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
             {sessionsWithParticipants.map((session) => {
               const statusLabel = session.isCancelled
-                ? "Session annulée"
+                ? "Session annulÃ©e"
                 : session.isOpen
                 ? "Session ouverte"
-                : "Session fermée";
+                : "Session fermÃ©e";
               const statusClasses = session.isCancelled
                 ? "border-red-500/40 bg-red-500/15 text-red-200"
                 : session.isOpen
@@ -542,7 +673,7 @@ const updateAvailability = async (
                       <h3 className="mt-1 text-lg font-semibold text-white">{session.formationTitle}</h3>
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-white/50">
                         <span>
-                          {session.reservedCount}/{session.capacity} places • {session.percent}% rempli
+                          {session.reservedCount}/{session.capacity} places â€¢ {session.percent}% rempli
                         </span>
                         <span className={`inline-flex rounded-full border px-3 py-1 font-semibold ${statusClasses}`}>
                           {statusLabel}
@@ -550,7 +681,7 @@ const updateAvailability = async (
                       </div>
                       {session.isCancelled && (
                         <p className="mt-2 text-xs text-red-200">
-                          Session annulée : pensez à prévenir les participants déjà inscrits.
+                          Session annulÃ©e : pensez Ã  prÃ©venir les participants dÃ©jÃ  inscrits.
                         </p>
                       )}
                     </div>
@@ -585,15 +716,15 @@ const updateAvailability = async (
             );
             })}
             {sessionsWithParticipants.length === 0 && !isLoading && (
-              <p className="text-sm text-white/60">Aucune session planifiée.</p>
+              <p className="text-sm text-white/60">Aucune session planifiÃ©e.</p>
             )}
           </div>
         </section>
 
         <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
-          <h2 className="text-2xl font-semibold">Réservations en temps réel</h2>
+          <h2 className="text-2xl font-semibold">RÃ©servations en temps rÃ©el</h2>
           <p className="mt-2 text-sm text-white/65">
-            Historique des paiements Stripe et demandes de virement. La colonne statut vous aide à suivre ce qu&apos;il reste à valider.
+            Historique des paiements Stripe et demandes de virement. La colonne statut vous aide Ã  suivre ce qu&apos;il reste Ã  valider.
           </p>
           <div className="mt-6 overflow-x-auto">
             <table className="min-w-full divide-y divide-white/10 text-sm text-white/80">
@@ -668,9 +799,9 @@ const updateAvailability = async (
                               >
                                 {option.sessionLabel}
                                 {option.isCancelled
-                                  ? " — annulée"
+                                  ? " â€” annulÃ©e"
                                   : option.remaining <= 0
-                                  ? " — complet"
+                                  ? " â€” complet"
                                   : ""}
                               </option>
                             ))}
@@ -702,7 +833,7 @@ const updateAvailability = async (
                               })
                             }
                           >
-                            {isUpdatingReservation ? "Mise à jour..." : "Appliquer"}
+                            {isUpdatingReservation ? "Mise Ã  jour..." : "Appliquer"}
                           </button>
                         </div>
                       </td>
@@ -712,7 +843,7 @@ const updateAvailability = async (
               </tbody>
             </table>
             {reservations.length === 0 && !isLoading && (
-              <p className="mt-6 text-sm text-white/60">Aucune réservation enregistrée pour le moment.</p>
+              <p className="mt-6 text-sm text-white/60">Aucune rÃ©servation enregistrÃ©e pour le moment.</p>
             )}
           </div>
         </section>
@@ -720,7 +851,7 @@ const updateAvailability = async (
         <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
           <h2 className="text-2xl font-semibold">Messages de contact</h2>
           <p className="mt-2 text-sm text-white/65">
-            Suivez les demandes envoyées depuis le formulaire de contact. Pensez à répondre rapidement pour confirmer la prise en charge.
+            Suivez les demandes envoyÃ©es depuis le formulaire de contact. Pensez Ã  rÃ©pondre rapidement pour confirmer la prise en charge.
           </p>
           <div className="mt-6 space-y-4">
             {contactMessages.map((message) => (
@@ -743,7 +874,7 @@ const updateAvailability = async (
                           : "bg-amber-400/15 text-amber-200"
                       }`}
                     >
-                      {message.status === "handled" ? "Traité" : "Nouveau"}
+                      {message.status === "handled" ? "TraitÃ©" : "Nouveau"}
                     </span>
                   </div>
                 </div>
@@ -757,7 +888,7 @@ const updateAvailability = async (
                       className="btn-secondary text-xs uppercase tracking-[0.3em]"
                       onClick={() => handleContactStatusChange(message.id, "new")}
                     >
-                      Marquer comme à traiter
+                      Marquer comme Ã  traiter
                     </button>
                   ) : (
                     <button
@@ -765,7 +896,7 @@ const updateAvailability = async (
                       className="btn-primary text-xs uppercase tracking-[0.3em]"
                       onClick={() => handleContactStatusChange(message.id, "handled")}
                     >
-                      Marquer comme traité
+                      Marquer comme traitÃ©
                     </button>
                   )}
                   <button
@@ -779,7 +910,7 @@ const updateAvailability = async (
               </div>
             ))}
             {contactMessages.length === 0 && !isLoading && (
-              <p className="text-sm text-white/60">Aucun message reçu pour le moment.</p>
+              <p className="text-sm text-white/60">Aucun message reÃ§u pour le moment.</p>
             )}
           </div>
         </section>
@@ -789,5 +920,7 @@ const updateAvailability = async (
 }
 
 export default Admin;
+
+
 
 

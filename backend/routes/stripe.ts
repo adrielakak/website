@@ -1,14 +1,14 @@
 import { Router } from "express";
 import Stripe from "stripe";
 
-import { formations } from "../data/formations.js";
+import { getFormations } from "../services/formationsService.js";
 import { getSessionAvailability } from "../services/availabilityService.js";
 import { addReservation, countActiveReservationsBySession } from "../services/reservationStorage.js";
 
 const router = Router();
 
 function resolveLineItems(
-  formation: (typeof formations)[number],
+  formation: Awaited<ReturnType<typeof getFormations>>[number],
   sessionLabel: string,
   configuredValue?: string
 ): Stripe.Checkout.SessionCreateParams.LineItem[] {
@@ -69,6 +69,7 @@ router.post("/create-checkout-session", async (req, res) => {
     return res.status(500).json({ message: "La clé Stripe n'est pas configurée." });
   }
 
+  const formations = await getFormations();
   const formation = formations.find((item) => item.id === formationId);
   if (!formation) {
     return res.status(404).json({ message: "Formation introuvable." });

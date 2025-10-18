@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiClient } from "../lib/api";
+import { apiClient, API_BASE_URL } from "../lib/api";
 
 interface NKNewsItem {
   title?: string;
@@ -39,7 +39,11 @@ export default function NKNews() {
           {articles.map((item, i) => (
             <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden">
               {item.image && (
-                <img src={item.image} alt="" className="w-full h-64 object-cover" />
+                <img
+                  src={item.image.startsWith("/") ? `${API_BASE_URL}${item.image}` : item.image}
+                  alt=""
+                  className="w-full h-64 object-cover"
+                />
               )}
               <div className="p-4">
                 {item.title && <h2 className="font-semibold mb-2">{item.title}</h2>}
@@ -55,4 +59,3 @@ export default function NKNews() {
     </div>
   );
 }
-
