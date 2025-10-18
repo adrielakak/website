@@ -1,8 +1,6 @@
-﻿import nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
 
-/* -----------------------------------------------------------
-   Types utilisés pour mieux encadrer la fonction
------------------------------------------------------------ */
+// Types alignés avec le stockage de réservation
 interface ReservationRecord {
   id: string;
   createdAt: string;
@@ -17,14 +15,14 @@ interface ReservationRecord {
   stripeSessionId?: string;
 }
 
-interface ConfirmationEmailPayload {`n  reservation: ReservationRecord & { location?: string };`n  paymentStatus: "pending" | "confirmed";`n  checkoutSessionUrl?: string;`n  reason?: "new" | "changed";`n};
+interface ConfirmationEmailPayload {
+  reservation: ReservationRecord & { location?: string };
   paymentStatus: "pending" | "confirmed";
   checkoutSessionUrl?: string;
+  // reason = "changed" quand il s'agit d'un déplacement de session
+  reason?: "new" | "changed";
 }
 
-/* -----------------------------------------------------------
-   Gestion du transport SMTP
------------------------------------------------------------ */
 let transporter: nodemailer.Transporter | null = null;
 
 function buildTransporter() {
@@ -57,15 +55,17 @@ export function isEmailEnabled() {
   return Boolean(getTransporter() && process.env.EMAIL_FROM);
 }
 
-/* -----------------------------------------------------------
-   Fonction principale d'envoi d'e-mail
------------------------------------------------------------ */
-export async function sendReservationConfirmationEmail({`n  reservation,`n  paymentStatus,`n  checkoutSessionUrl,`n  reason = "new",`n}: ConfirmationEmailPayload) {
+export async function sendReservationConfirmationEmail({
+  reservation,
+  paymentStatus,
+  checkoutSessionUrl,
+  reason = "new",
+}: ConfirmationEmailPayload) {
   const mailer = getTransporter();
   const from = process.env.EMAIL_FROM;
 
   if (!mailer || !from) {
-    console.warn("Email non envoyé : transporteur SMTP ou expéditeur non configurés.");
+    console.warn("Email non envoyé : transport SMTP ou expéditeur non configuré.");
     return;
   }
 
@@ -85,9 +85,6 @@ export async function sendReservationConfirmationEmail({`n  reservation,`n  paym
       ? "Votre paiement a bien été reçu."
       : "Votre réservation est enregistrée et en attente de validation du paiement.";
 
-  /* -----------------------------------------------------------
-     Version HTML de l'e-mail
-  ----------------------------------------------------------- */
   const html = `
     <div style="font-family: Arial, sans-serif; color: #222; line-height: 1.6;">
       <p>Bonjour <strong>${reservation.customerName}</strong>,</p>
@@ -106,19 +103,15 @@ export async function sendReservationConfirmationEmail({`n  reservation,`n  paym
 
       ${
         checkoutSessionUrl
-          ? `<p>Reçu Stripe : <a href="${checkoutSessionUrl}" target="_blank">${checkoutSessionUrl}</a></p>`
+          ? `<p>Reçu Stripe : <a href="${checkoutSessionUrl}" target="_blank" rel="noopener">${checkoutSessionUrl}</a></p>`
           : ""
       }
 
-      
       <p>À très bientôt !</p>
       <p style="margin-top: 20px;">— <strong>Les Ateliers Théâtre de Nantes</strong></p>
     </div>
   `;
 
-  /* -----------------------------------------------------------
-     Version texte brut (fallback)
-  ----------------------------------------------------------- */
   const text = `
 Bonjour ${reservation.customerName},
 
@@ -128,9 +121,7 @@ Stage : ${reservation.formationTitle}
 Session : ${reservation.sessionLabel}
 Lieu : ${reservation.location || "Ateliers Théâtre de Nantes — Centre-ville"}
 ID de réservation : ${reservation.id}
-Mode de paiement : ${
-    reservation.paymentMethod === "stripe" ? "Carte bancaire (Stripe)" : "Virement bancaire"
-  }
+Mode de paiement : ${reservation.paymentMethod === "stripe" ? "Carte bancaire (Stripe)" : "Virement bancaire"}
 
 ${checkoutSessionUrl ? `Reçu Stripe : ${checkoutSessionUrl}` : ""}
 
@@ -138,9 +129,6 @@ ${checkoutSessionUrl ? `Reçu Stripe : ${checkoutSessionUrl}` : ""}
 — Les Ateliers Théâtre de Nantes
 `;
 
-  /* -----------------------------------------------------------
-     Envoi de l'e-mail
-  ----------------------------------------------------------- */
   await mailer.sendMail({
     from,
     to: reservation.customerEmail,
@@ -152,3 +140,4 @@ ${checkoutSessionUrl ? `Reçu Stripe : ${checkoutSessionUrl}` : ""}
 
   console.log(`Email envoyé à ${reservation.customerEmail}`);
 }
+
