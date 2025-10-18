@@ -30,7 +30,7 @@ export default function NKNews() {
   }, []);
 
   return (
-    <div className="bg-brand-midnight text-white min-h-screen p-8 space-y-8">
+    <div className="bg-brand-midnight text-white min-h-screen px-6 sm:px-8 pt-28 sm:pt-36 pb-16 space-y-8">
       <h1 className="text-3xl font-bold text-center">NKNEWS</h1>
       {loading && <p className="text-center text-gray-500">Chargement¦</p>}
       {error && <p className="text-center text-red-600">{error}</p>}
@@ -59,5 +59,6 @@ export default function NKNews() {
     </div>
   );
 }
+
 
 
