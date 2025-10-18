@@ -21,7 +21,7 @@ export default function NKNews() {
         setError(null);
       } catch (e) {
         console.error(e);
-        setError("Impossible de charger les actualitÃ©s pour le moment.");
+        setError("Impossible de charger les actualitées pour le moment.");
       } finally {
         setLoading(false);
       }
@@ -32,7 +32,7 @@ export default function NKNews() {
   return (
     <div className="bg-brand-midnight text-white min-h-screen p-8 space-y-8">
       <h1 className="text-3xl font-bold text-center">NKNEWS</h1>
-      {loading && <p className="text-center text-gray-500">Chargementâ€¦</p>}
+      {loading && <p className="text-center text-gray-500">Chargement¦</p>}
       {error && <p className="text-center text-red-600">{error}</p>}
       {!loading && !error && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -52,7 +52,7 @@ export default function NKNews() {
             </div>
           ))}
           {articles.length === 0 && (
-            <p className="col-span-full text-center text-gray-500">Aucune actualitÃ© pour le moment.</p>
+            <p className="col-span-full text-center text-gray-500">Aucune actualitée pour le moment.</p>
           )}
         </div>
       )}
