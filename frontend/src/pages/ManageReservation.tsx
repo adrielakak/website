@@ -207,7 +207,7 @@ function ManageReservation() {
     <div className="bg-brand-midnight pb-20 text-white sm:pb-24">
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/30 via-brand-midnight to-brand-midnight" />
-        <div className="relative mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-24">
+        <div className="relative mx-auto w-full max-w-5xl px-4 py-20 sm:px-6 sm:py-24">
           <AnimatedContent distance={90}>
             <div className="space-y-6">
               <p className="text-[11px] font-semibold uppercase tracking-[0.45em] text-white/60 sm:text-xs">
@@ -225,7 +225,7 @@ function ManageReservation() {
         </div>
       </section>
 
-      <div className="mx-auto mt-12 max-w-5xl space-y-8 px-4 sm:px-6">
+      <div className="mx-auto mt-12 w-full max-w-5xl space-y-8 px-4 sm:px-6">
         <AnimatedContent distance={70}>
           <div className="rounded-[32px] border border-white/10 bg-white/[0.04] p-6 shadow-glow-soft sm:p-8">
             <h2 className="text-2xl font-semibold text-white">Retrouver ma réservation</h2>
