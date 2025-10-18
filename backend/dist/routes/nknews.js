@@ -4,6 +4,64 @@ import { randomUUID } from "crypto";
 import { resolveDataPath } from "../services/storagePaths.js";
 const router = Router();
 const filePath = resolveDataPath("nknews.json");
+const DEFAULT_ARTICLES = [
+    {
+        id: "nknews-default-tf1-barbamama",
+        title: "TF1 – Voix de Barbamama",
+        content: "Retrouvez Nathalie Karsenti derrière la voix de Barbamama dans les rediffusions de Barbapapa en Famille sur TF1 et MyTF1.",
+        image: "",
+        createdAt: "2024-01-15T09:00:00.000Z",
+    },
+    {
+        id: "nknews-default-netflix-peches",
+        title: "Netflix – Série \"Péchés inavouables\"",
+        content: "Dans la mini-série britannique Péchés inavouables (Obsession), Nathalie prête sa voix à la version française de ce thriller psychologique disponible sur Netflix.",
+        image: "",
+        createdAt: "2024-03-10T09:00:00.000Z",
+    },
+    {
+        id: "nknews-default-netflix-fall-for-me",
+        title: "Netflix – Film \"Fall for Me\"",
+        content: "Nathalie Karsenti intervient sur le doublage VF du film romantique Fall for Me en apportant des voix additionnelles qui accompagnent les personnages secondaires.",
+        image: "",
+        createdAt: "2024-04-05T09:00:00.000Z",
+    },
+    {
+        id: "nknews-default-netflix-intimidation",
+        title: "Netflix – Thriller \"Intimidation\"",
+        content: "Dans l’adaptation du roman d’Harlan Coben Intimidation, Nathalie participe au casting voix français et incarne plusieurs personnages clés tout au long de la série.",
+        image: "",
+        createdAt: "2024-05-18T09:00:00.000Z",
+    },
+    {
+        id: "nknews-default-netflix-effet-veuf",
+        title: "Netflix – Série documentaire \"L'effet veuf\"",
+        content: "Pour la série documentaire L'effet veuf, Nathalie Karsenti assure la narration française de plusieurs épisodes consacrés aux grandes affaires criminelles.",
+        image: "",
+        createdAt: "2024-06-02T09:00:00.000Z",
+    },
+    {
+        id: "nknews-default-apple-defending-jacob",
+        title: "Apple TV+ – Série \"Defending Jacob\"",
+        content: "Sur Apple TV+, Nathalie prête sa voix à la version française de Defending Jacob, la mini-série policière portée par Chris Evans.",
+        image: "",
+        createdAt: "2024-07-12T09:00:00.000Z",
+    },
+    {
+        id: "nknews-default-apple-presume-innocent",
+        title: "Apple TV+ – Série \"Présumé innocent\"",
+        content: "Elle fait également partie du casting VF de Présumé innocent, la série événement produite par David E. Kelley pour Apple TV+.",
+        image: "",
+        createdAt: "2024-08-20T09:00:00.000Z",
+    },
+    {
+        id: "nknews-default-canal-billions",
+        title: "Canal+ – Série \"Billions\"",
+        content: "Dans la saison finale de Billions diffusée sur Canal+ Séries, Nathalie renforce la version française avec de nouvelles voix additionnelles.",
+        image: "",
+        createdAt: "2024-09-15T09:00:00.000Z",
+    },
+];
 async function readList() {
     const exists = await fs.pathExists(filePath);
     if (!exists)
@@ -37,10 +95,20 @@ async function writeList(list) {
     await fs.ensureFile(filePath);
     await fs.writeFile(filePath, JSON.stringify(list, null, 2), "utf-8");
 }
+function mergeWithDefaults(list) {
+    const seen = new Set(list.map((item) => item.id));
+    const merged = [...list];
+    for (const article of DEFAULT_ARTICLES) {
+        if (!seen.has(article.id)) {
+            merged.push(article);
+        }
+    }
+    return merged.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
 router.get("/", async (_req, res) => {
     try {
         const list = await readList();
-        return res.json(list);
+        return res.json(mergeWithDefaults(list));
     }
     catch (e) {
         console.error("Erreur lecture NKNEWS:", e);
@@ -82,7 +150,12 @@ router.patch("/:id", async (req, res) => {
         if (index === -1)
             return res.status(404).json({ message: "Article introuvable." });
         const { title, content, image } = req.body ?? {};
-        list[index] = { ...list[index], ...(title !== undefined ? { title } : {}), ...(content !== undefined ? { content } : {}), ...(image !== undefined ? { image } : {}) };
+        list[index] = {
+            ...list[index],
+            ...(title !== undefined ? { title } : {}),
+            ...(content !== undefined ? { content } : {}),
+            ...(image !== undefined ? { image } : {}),
+        };
         await writeList(list);
         return res.json({ success: true, article: list[index] });
     }
