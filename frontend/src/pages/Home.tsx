@@ -44,7 +44,7 @@ const paymentInfo = [
   {
     title: "Paiement par virement bancaire",
     text: "Réception de l'IBAN dès votre réservation. Merci d'effectuer le virement avant le début du stage pour confirmer votre place.",
-    detail: "IBAN utilisé par défaut : FR76 XXXX XXXX XXXX XXXX XXXX X (personnalisez-le dans le fichier .env).",
+    detail: "IBAN utilisé par défaut : FR76 XXXX XXXX XXXX XXXX XXXX X",
   },
   {
     title: "Confirmation et facturation",
