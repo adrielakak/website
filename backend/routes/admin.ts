@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from "express";
+﻿import { NextFunction, Request, Response, Router } from "express";
 
 import { getFormations, addSession } from "../services/formationsService.js";
 import {
@@ -16,9 +16,11 @@ import {
   ReservationStatus,
   ReservationUpdate,
   updateReservationById,
+  deleteReservationById,
 } from "../services/reservationStorage.js";
 import { deleteContactMessage, listContactMessages, updateContactMessageStatus } from "../services/contactStorage.js";
 import { sendReservationConfirmationEmail } from "../services/emailService.js";
+import { sendReservationCancellationEmail } from "../services/emailService.js";
 
 const router = Router();
 
@@ -279,8 +281,33 @@ router.delete("/contact/:id", async (req, res) => {
   }
 });
 
+
+
+
+
+
+
+
+router.delete("/reservations/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const reservation = await findReservationById(id);
+    if (!reservation) {
+      return res.status(404).json({ message: "Réservation introuvable." });
+    }
+    try {
+      await sendReservationCancellationEmail(reservation as any);
+    } catch (e) {
+      console.warn("E-mail d'annulation non envoyé (admin):", e);
+    }
+    const deleted = await deleteReservationById(id);
+    if (!deleted) {
+      return res.status(500).json({ message: "Impossible de supprimer la réservation." });
+    }
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Erreur admin/reservations:delete:", error);
+    return res.status(500).json({ message: "Erreur interne lors de la suppression." });
+  }
+});
 export default router;
-
-
-
-

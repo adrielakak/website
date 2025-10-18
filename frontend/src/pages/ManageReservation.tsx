@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+﻿import { FormEvent, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import AnimatedContent from "../components/reactbits/AnimatedContent";
@@ -171,6 +171,26 @@ function ManageReservation() {
       setIsUpdating(false);
     }
   };
+  const handleCancel = async () => {
+    if (!reservation) return;
+    try {
+      setIsUpdating(true);
+      setUpdateError(null);
+      setSuccessMessage(null);
+      await apiClient.post(`/api/reservations/${reservation.id}/cancel`, {
+        customerEmail: reservation.customerEmail,
+      });
+      setSuccessMessage("Votre annulation a bien été prise en compte.");
+      setReservation(null);
+      setSessions([]);
+    } catch (error) {
+      setUpdateError(
+        extractErrorMessage(error, "Impossible d'annuler la réservation pour le moment. Réessayez plus tard.")
+      );
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const upcomingSessions = sessions.filter((s) => !s.isCancelled);
   const cancelledSessions = sessions.filter((s) => s.isCancelled);
@@ -317,6 +337,17 @@ function ManageReservation() {
                   </button>
                   <span className="text-xs text-white/50">La place libérée est immédiatement proposée aux autres participants.</span>
                 </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-red-200 hover:bg-red-500/20 disabled:opacity-70"
+                    onClick={handleCancel}
+                    disabled={isUpdating}
+                  >
+                    {isUpdating ? "Annulation..." : "Annuler ma réservation"}
+                  </button>
+                  <span className="text-xs text-white/50">La place libérée sera immédiatement remise à disposition.</span>
+                </div>
 
                 {updateError && (
                   <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{updateError}</p>
@@ -340,4 +371,6 @@ function ManageReservation() {
 }
 
 export default ManageReservation;
+
+
 

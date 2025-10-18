@@ -1,7 +1,8 @@
-import express, { Router } from "express";
+﻿import express, { Router } from "express";
 import Stripe from "stripe";
 
 import { sendReservationConfirmationEmail } from "../services/emailService.js";
+import { sendReservationCancellationEmail } from "../services/emailService.js";
 import { updateReservationByStripeSession } from "../services/reservationStorage.js";
 
 const router = Router();
@@ -72,3 +73,6 @@ router.post(
 );
 
 export default router;
+
+
+

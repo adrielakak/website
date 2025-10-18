@@ -1,4 +1,4 @@
-import cors from "cors";
+﻿import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 
@@ -18,13 +18,14 @@ import {
   readReservations,
   ReservationRecord,
   updateReservationById,
-} from "./services/reservationStorage.js";
+  deleteReservationById,} from "./services/reservationStorage.js";
 import {
   ensureAvailabilityDefaults,
   getAvailabilityList,
   getSessionAvailability,
 } from "./services/availabilityService.js";
 import { sendReservationConfirmationEmail } from "./services/emailService.js";
+import { sendReservationCancellationEmail } from './services/emailService.js';
 
 dotenv.config();
 
@@ -232,6 +233,32 @@ app.patch("/api/reservations/:reservationId", async (req, res) => {
 
   if (!customerEmail || !nextSessionId) {
     return res.status(400).json({ message: "Merci de préciser l'email et la nouvelle session souhaitée." });
+app.post("/api/reservations/:reservationId/cancel", async (req, res) => {
+  const { reservationId } = req.params;
+  const { customerEmail } = req.body ?? {};
+  if (!customerEmail) {
+    return res.status(400).json({ message: "Merci de préciser l'email utilisé pour la réservation." });
+  }
+  try {
+    const reservation = await findReservationById(reservationId);
+    if (!reservation || reservation.customerEmail.trim().toLowerCase() !== String(customerEmail).trim().toLowerCase()) {
+      return res.status(404).json({ message: "Réservation introuvable pour cet email." });
+    }
+    try {
+      await sendReservationCancellationEmail(reservation as any);
+    } catch (e) {
+      console.warn("E-mail d'annulation non envoyé (client):", e);
+    }
+    const deleted = await deleteReservationById(reservation.id);
+    if (!deleted) {
+      return res.status(500).json({ message: "Impossible de supprimer la réservation." });
+    }
+    return res.json({ message: "Votre annulation a bien été prise en compte." });
+  } catch (error) {
+    console.error("Erreur cancel reservation:", error);
+    return res.status(500).json({ message: "Impossible d'annuler la réservation pour le moment." });
+  }
+});
   }
 
   try {
@@ -326,3 +353,6 @@ await ensureAvailabilityDefaults(await getFormations());
 app.listen(PORT, () => {
   console.log(`Serveur Ateliers Théâtre de Nantes démarré sur le port ${PORT}`);
 });
+
+
+

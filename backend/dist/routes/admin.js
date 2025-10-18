@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { getFormations, addSession } from "../services/formationsService.js";
 import { getAvailabilityList, getSessionAvailability, upsertSessionAvailability, } from "../services/availabilityService.js";
-import { countActiveReservationsBySession, findReservationById, listReservations, readReservations, updateReservationById, } from "../services/reservationStorage.js";
+import { countActiveReservationsBySession, findReservationById, listReservations, readReservations, updateReservationById, deleteReservationById, } from "../services/reservationStorage.js";
 import { deleteContactMessage, listContactMessages, updateContactMessageStatus } from "../services/contactStorage.js";
 import { sendReservationConfirmationEmail } from "../services/emailService.js";
+import { sendReservationCancellationEmail } from "../services/emailService.js";
 const router = Router();
 function requireAdminKey(req, res, next) {
     const configuredKey = process.env.ADMIN_API_KEY;
@@ -229,6 +230,30 @@ router.delete("/contact/:id", async (req, res) => {
     catch (error) {
         console.error("Erreur admin/contact:delete:", error);
         res.status(500).json({ message: "Impossible de supprimer le message." });
+    }
+});
+router.delete("/reservations/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+        const reservation = await findReservationById(id);
+        if (!reservation) {
+            return res.status(404).json({ message: "Réservation introuvable." });
+        }
+        try {
+            await sendReservationCancellationEmail(reservation);
+        }
+        catch (e) {
+            console.warn("E-mail d'annulation non envoyé (admin):", e);
+        }
+        const deleted = await deleteReservationById(id);
+        if (!deleted) {
+            return res.status(500).json({ message: "Impossible de supprimer la réservation." });
+        }
+        return res.status(204).send();
+    }
+    catch (error) {
+        console.error("Erreur admin/reservations:delete:", error);
+        return res.status(500).json({ message: "Erreur interne lors de la suppression." });
     }
 });
 export default router;

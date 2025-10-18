@@ -91,3 +91,42 @@ ${checkoutSessionUrl ? `Reçu Stripe : ${checkoutSessionUrl}` : ""}
     });
     console.log(`Email envoyé à ${reservation.customerEmail}`);
 }
+export async function sendReservationCancellationEmail(reservation) {
+    const mailer = getTransporter();
+    const from = process.env.EMAIL_FROM;
+    if (!mailer || !from) {
+        console.warn("Email d'annulation non envoyé : configuration incomplète.");
+        return;
+    }
+    const adminCopy = process.env.EMAIL_NOTIFICATION_TO;
+    const subject = `Confirmation d'annulation - ${reservation.formationTitle}`;
+    const html = `
+    <div style="font-family: Arial, sans-serif; color: #222; line-height: 1.6;">
+      <p>Bonjour <strong>${reservation.customerName}</strong>,</p>
+      <p>Votre réservation a bien été annulée.</p>
+      <h3>Détails :</h3>
+      <ul>
+        <li><strong>Stage :</strong> ${reservation.formationTitle}</li>
+        <li><strong>Session :</strong> ${reservation.sessionLabel}</li>
+        <li><strong>Lieu :</strong> ${reservation.location || "Ateliers Théâtre de Nantes - Centre-ville"}</li>
+        <li><strong>ID de réservation :</strong> ${reservation.id}</li>
+      </ul>
+      <p>À une prochaine fois !</p>
+      <p style="margin-top: 20px;">- <strong>Les Ateliers Théâtre de Nantes</strong></p>
+    </div>
+  `;
+    const text = `Bonjour ${reservation.customerName},
+
+Votre réservation a bien été annulée.
+
+Stage : ${reservation.formationTitle}
+Session : ${reservation.sessionLabel}
+Lieu : ${reservation.location || "Ateliers Théâtre de Nantes - Centre-ville"}
+ID de réservation : ${reservation.id}
+
+À une prochaine fois !
+- Les Ateliers Théâtre de Nantes
+`;
+    await mailer.sendMail({ from, to: reservation.customerEmail, bcc: adminCopy ?? undefined, subject, text, html });
+    console.log(`Email d'annulation envoyé à ${reservation.customerEmail}`);
+}

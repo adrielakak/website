@@ -183,3 +183,17 @@ export async function listReservations(): Promise<ReservationRecord[]> {
   const reservations = await readReservations();
   return reservations.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
+
+export async function deleteReservationById(id: string): Promise<boolean> {
+  if (!id) {
+    return false;
+  }
+  const reservations = await readReservations();
+  const index = reservations.findIndex((reservation) => reservation.id === id);
+  if (index === -1) {
+    return false;
+  }
+  reservations.splice(index, 1);
+  await writeReservations(reservations);
+  return true;
+}

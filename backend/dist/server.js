@@ -10,9 +10,10 @@ import nknewsRoutes from "./routes/nknews.js";
 import uploadsRouter from "./routes/uploads.js";
 import { resolveDataPath } from "./services/storagePaths.js";
 import { addContactMessage } from "./services/contactStorage.js";
-import { addReservation, countActiveReservationsBySession, findReservationById, readReservations, updateReservationById, } from "./services/reservationStorage.js";
+import { addReservation, countActiveReservationsBySession, findReservationById, readReservations, updateReservationById, deleteReservationById, } from "./services/reservationStorage.js";
 import { ensureAvailabilityDefaults, getAvailabilityList, getSessionAvailability, } from "./services/availabilityService.js";
 import { sendReservationConfirmationEmail } from "./services/emailService.js";
+import { sendReservationCancellationEmail } from './services/emailService.js';
 dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT ?? 4000);
@@ -182,6 +183,34 @@ app.patch("/api/reservations/:reservationId", async (req, res) => {
     const { customerEmail, sessionId: nextSessionId } = req.body ?? {};
     if (!customerEmail || !nextSessionId) {
         return res.status(400).json({ message: "Merci de préciser l'email et la nouvelle session souhaitée." });
+        app.post("/api/reservations/:reservationId/cancel", async (req, res) => {
+            const { reservationId } = req.params;
+            const { customerEmail } = req.body ?? {};
+            if (!customerEmail) {
+                return res.status(400).json({ message: "Merci de préciser l'email utilisé pour la réservation." });
+            }
+            try {
+                const reservation = await findReservationById(reservationId);
+                if (!reservation || reservation.customerEmail.trim().toLowerCase() !== String(customerEmail).trim().toLowerCase()) {
+                    return res.status(404).json({ message: "Réservation introuvable pour cet email." });
+                }
+                try {
+                    await sendReservationCancellationEmail(reservation);
+                }
+                catch (e) {
+                    console.warn("E-mail d'annulation non envoyé (client):", e);
+                }
+                const deleted = await deleteReservationById(reservation.id);
+                if (!deleted) {
+                    return res.status(500).json({ message: "Impossible de supprimer la réservation." });
+                }
+                return res.json({ message: "Votre annulation a bien été prise en compte." });
+            }
+            catch (error) {
+                console.error("Erreur cancel reservation:", error);
+                return res.status(500).json({ message: "Impossible d'annuler la réservation pour le moment." });
+            }
+        });
     }
     try {
         const reservation = await findReservationById(reservationId);
