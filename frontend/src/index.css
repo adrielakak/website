@@ -6,8 +6,7 @@
   color-scheme: dark;
 }
 
-html,
-body {
+html,`r`nbody {`r`n  background-color: #080b16;
   overflow-x: hidden;
 }
 
@@ -55,3 +54,4 @@ body {
   .section-title { @apply text-2xl; }
   .section-subtitle { @apply text-base; }
 }
+
