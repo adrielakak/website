@@ -7,6 +7,7 @@ import adminRouter from "./routes/admin.js";
 import availabilityRouter from "./routes/availability.js";
 import stripeRouter from "./routes/stripe.js";
 import stripeWebhookRouter from "./routes/stripeWebhook.js";
+import nknewsRoutes from "./routes/nknews.js";
 import { addContactMessage } from "./services/contactStorage.js";
 import {
   addReservation,
@@ -63,6 +64,8 @@ app.get("/health", (_req, res) => {
 app.get("/api/formations", (_req, res) => {
   res.json(formations);
 });
+
+app.use("/api/nknews", nknewsRoutes);
 
 app.post("/api/reservations", async (req, res) => {
   const { customerName, customerEmail, formationId, sessionId, paymentMethod } = req.body ?? {};
@@ -271,6 +274,15 @@ app.patch("/api/reservations/:reservationId", async (req, res) => {
 
     if (!updated) {
       return res.status(500).json({ message: "Impossible de mettre à jour la réservation." });
+    }
+
+    try {
+      await sendReservationConfirmationEmail({
+        reservation: updated as any,
+        paymentStatus: updated.status === "stripe_confirmed" ? "confirmed" : "pending",
+      });
+    } catch (e) {
+      console.warn("E-mail de confirmation non envoyé après changement de session (client):", e);
     }
 
     const sanitizedReservation = {

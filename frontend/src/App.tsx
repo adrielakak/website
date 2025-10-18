@@ -8,6 +8,11 @@ import Formations from "./pages/Formations";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import ManageReservation from "./pages/ManageReservation";
+import CoursConseils from "./pages/CoursConseils";
+import NKNews from "./pages/NKNews";
+import Vidoleo from "./pages/Vidoleo";
+import Legal from "./pages/Legal";
+import ThankYou from "./pages/ThankYou";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -29,6 +34,11 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/formations" element={<Formations />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/cours-et-conseils" element={<CoursConseils />} />
+          <Route path="/nknews" element={<NKNews />} />
+          <Route path="/vidoleo" element={<Vidoleo />} />
+          <Route path="/mentions-legales" element={<Legal />} />
+          <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/reservations" element={<ManageReservation />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>

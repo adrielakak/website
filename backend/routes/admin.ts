@@ -18,6 +18,7 @@ import {
   updateReservationById,
 } from "../services/reservationStorage.js";
 import { deleteContactMessage, listContactMessages, updateContactMessageStatus } from "../services/contactStorage.js";
+import { sendReservationConfirmationEmail } from "../services/emailService.js";
 
 const router = Router();
 
@@ -176,6 +177,16 @@ router.patch("/reservations/:id", async (req, res) => {
     }
 
     const updated = await updateReservationById(id, updates);
+    if (updated) {
+      try {
+        await sendReservationConfirmationEmail({
+          reservation: updated as any,
+          paymentStatus: updated.status === "stripe_confirmed" ? "confirmed" : "pending",
+        });
+      } catch (e) {
+        console.warn("E-mail de confirmation non envoyé après changement (admin):", e);
+      }
+    }
     if (!updated) {
       return res.status(404).json({ message: "Réservation introuvable." });
     }

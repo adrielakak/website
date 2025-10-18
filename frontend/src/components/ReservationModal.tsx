@@ -229,9 +229,9 @@ function ReservationModal({ isOpen, formation, availability, onClose }: Reservat
                       return " – session fermée";
                     }
                     if (info.remaining <= 0) {
-                      return " – complet";
+                      return " — complet";
                     }
-                    return ` – ${info.remaining} place${info.remaining > 1 ? "s" : ""} restantes`;
+                    return "";
                   })()}
                 </option>
               ))}

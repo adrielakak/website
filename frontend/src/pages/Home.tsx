@@ -309,8 +309,8 @@ function Home() {
                 </div>
                 <div>
                   <p className="text-white/60">Téléphone</p>
-                  <a href="tel:+33652897410" className="text-lg font-semibold text-white hover:underline">
-                    06 52 89 74 10
+                  <a href="tel:+33609425911" className="text-lg font-semibold text-white hover:underline">
+                    06 09 42 59 11
                   </a>
                 </div>
               </div>

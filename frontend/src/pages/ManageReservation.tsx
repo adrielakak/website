@@ -394,7 +394,7 @@ function ManageReservation() {
                 <a className="font-semibold text-brand-gold hover:underline" href="mailto:nk26fr@gmail.com">
                   nk26fr@gmail.com
                 </a>{" "}
-                ou appelez le <a className="font-semibold text-brand-gold hover:underline" href="tel:+33652897410">06 52 89 74 10</a>.
+                ou appelez le <a className="font-semibold text-brand-gold hover:underline" href="tel:+33609425911">06 09 42 59 11</a>.
               </div>
             </div>
           </AnimatedContent>

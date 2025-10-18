@@ -68,13 +68,17 @@ function Admin() {
   const [reservationSessionDrafts, setReservationSessionDrafts] = useState<Record<string, string>>({});
   const [reservationStatusDrafts, setReservationStatusDrafts] = useState<Record<string, AdminReservationStatus>>({});
   const [updatingReservationId, setUpdatingReservationId] = useState<string | null>(null);
+  const [nknews, setNknews] = useState<Array<{ title?: string; content?: string; image?: string; createdAt?: string }>>([]);
+  const [nkTitle, setNkTitle] = useState("");
+  const [nkContent, setNkContent] = useState("");
+  const [nkImage, setNkImage] = useState("");
 
   const dateFormatter = useMemo(() => new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }), []);
 
   const fetchDashboard = async (key: string) => {
     try {
       setIsLoading(true);
-      const [availabilityResponse, reservationsResponse, contactResponse] = await Promise.all([
+      const [availabilityResponse, reservationsResponse, contactResponse, nknewsResponse] = await Promise.all([
         apiClient.get<{ sessions: AdminAvailabilityItem[] }>("/api/admin/availability", {
           headers: { "x-admin-key": key },
         }),
@@ -84,6 +88,7 @@ function Admin() {
         apiClient.get<{ messages: AdminContactMessage[] }>("/api/admin/contact", {
           headers: { "x-admin-key": key },
         }),
+        apiClient.get<Array<{ title?: string; content?: string; image?: string; createdAt?: string }>>("/api/nknews"),
       ]);
 
       setAvailability(availabilityResponse.data.sessions);
@@ -107,6 +112,7 @@ function Admin() {
         }, {})
       );
       setContactMessages(contactResponse.data.messages);
+      setNknews(nknewsResponse.data ?? []);
       setAdminKey(key);
       setErrorMessage(null);
     } catch (error) {
@@ -115,6 +121,27 @@ function Admin() {
       setAdminKey(null);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const addNknews = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      await apiClient.post("/api/nknews", {
+        title: nkTitle.trim(),
+        content: nkContent.trim(),
+        image: nkImage.trim(),
+      });
+      setNkTitle("");
+      setNkContent("");
+      setNkImage("");
+      const res = await apiClient.get<Array<{ title?: string; content?: string; image?: string; createdAt?: string }>>(
+        "/api/nknews"
+      );
+      setNknews(res.data ?? []);
+    } catch (e) {
+      console.error("Erreur ajout NKNEWS:", e);
+      setErrorMessage("Impossible d'ajouter l'actualité.");
     }
   };
 
@@ -428,6 +455,60 @@ const updateAvailability = async (
         </section>
 
         <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
+          <h2 className="text-2xl font-semibold">NKNEWS</h2>
+          <p className="mt-2 text-sm text-white/65">Publiez une brève (titre, texte, URL d'image).</p>
+          <form className="mt-6 grid gap-4 md:grid-cols-3" onSubmit={addNknews}>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-[0.3em] text-white/60">Titre</label>
+              <input
+                value={nkTitle}
+                onChange={(e) => setNkTitle(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                placeholder="Titre de l'actualité"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold uppercase tracking-[0.3em] text-white/60">Texte</label>
+              <input
+                value={nkContent}
+                onChange={(e) => setNkContent(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                placeholder="Contenu de l'actualité"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-semibold uppercase tracking-[0.3em] text-white/60">Image (URL)</label>
+              <input
+                value={nkImage}
+                onChange={(e) => setNkImage(e.target.value)}
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                placeholder="https://..."
+              />
+            </div>
+            <div className="flex items-end">
+              <button type="submit" className="btn-primary">Publier</button>
+            </div>
+          </form>
+          <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {nknews.map((item, i) => (
+              <div key={i} className="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
+                {item.image && <img src={item.image} className="w-full h-48 object-cover" alt="" />}
+                <div className="p-4">
+                  {item.title && <h3 className="font-semibold">{item.title}</h3>}
+                  {item.content && <p className="text-sm text-white/70 mt-1 whitespace-pre-line">{item.content}</p>}
+                  {item.createdAt && (
+                    <p className="mt-2 text-xs text-white/50">{new Date(item.createdAt).toLocaleString("fr-FR")}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+            {nknews.length === 0 && (
+              <p className="text-white/60">Aucune actualité publiée.</p>
+            )}
+          </div>
+        </section>
+
+        <section className="rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
           <h2 className="text-2xl font-semibold">Remplissage des sessions</h2>
           <p className="mt-2 text-sm text-white/65">
             Visualisez l&apos;occupation de chaque session et les participants déjà inscrits.
@@ -700,3 +781,6 @@ const updateAvailability = async (
 }
 
 export default Admin;
+
+
+
