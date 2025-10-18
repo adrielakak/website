@@ -94,6 +94,5 @@ Backend : http://localhost:4000
 
 ## Credit
 
-Contenus Nathalie Karsenti (voix francaise de Zoe Saldana, Eva Mendes, etc.).  
 Animations adaptees depuis [ReactBits.dev](https://reactbits.dev) (MIT).  
-Developpement : Ateliers Theatre de Nantes.
+Developpement : Ateliers Theatre de Nantes by Adriel
