@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -44,4 +44,14 @@ body {
 
 .card-lux:hover::after {
   @apply opacity-100;
+}
+
+/* Mobile-first accessibility and sizing tweaks. Desktop unchanged. */
+@media (max-width: 640px) {
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+  img, video { max-width: 100%; height: auto; }
+  .btn-primary { @apply px-5 py-3 text-sm; }
+  .btn-secondary { @apply px-5 py-3 text-xs; }
+  .section-title { @apply text-2xl; }
+  .section-subtitle { @apply text-base; }
 }
