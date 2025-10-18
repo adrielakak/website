@@ -271,6 +271,15 @@ app.post("/api/reservations/:reservationId/cancel", async (req, res) => {
       return res.status(404).json({ message: "Réservation introuvable pour cet email." });
     }
 
+    const previousChanges = reservation.sessionChangeCount ?? 0;
+    if (previousChanges >= 1) {
+      return res.status(409).json({ message: "Vous avez déjà utilisé votre changement de session. Merci de nous contacter pour toute assistance." });
+    }
+
+    if (reservation.sessionId === nextSessionId) {
+      return res.status(400).json({ message: "Vous êtes déjà inscrit(e) sur cette session." });
+    }
+
     if (reservation.status === "cancelled") {
       return res
         .status(409)
@@ -306,6 +315,7 @@ app.post("/api/reservations/:reservationId/cancel", async (req, res) => {
     const updated = await updateReservationById(reservation.id, {
       sessionId: nextSessionId,
       sessionLabel: targetSession.label,
+      sessionChangeCount: previousChanges + 1,
     });
 
     if (!updated) {

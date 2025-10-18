@@ -4,7 +4,7 @@ export const formations = [
         title: "Stage intensif Théâtre & Initiation doublage",
         description: "Un week-end de 12 heures pour explorer le jeu d'acteur, travailler la voix et découvrir les coulisses du doublage avec Nathalie Karsenti.",
         duration: "12 h (week-end)",
-        price: 285,
+        price: 1,
         location: "8 rue Mercoeur, 44000 Nantes",
         teacher: "Nathalie Karsenti",
         objectives: [
