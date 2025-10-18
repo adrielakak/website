@@ -1,51 +1,91 @@
 ﻿import { Router } from "express";
 import fs from "fs-extra";
+import { randomUUID } from "crypto";
 import { resolveDataPath } from "../services/storagePaths.js";
 
 const router = Router();
 const filePath = resolveDataPath("nknews.json");
 
+async function readList(): Promise<any[]> {
+  const exists = await fs.pathExists(filePath);
+  if (!exists) return [];
+  const raw = await fs.readFile(filePath, "utf-8");
+  try {
+    const data = JSON.parse(raw);
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+async function writeList(list: any[]): Promise<void> {
+  await fs.ensureFile(filePath);
+  await fs.writeFile(filePath, JSON.stringify(list, null, 2), "utf-8");
+}
+
 router.get("/", async (_req, res) => {
   try {
-    const exists = await fs.pathExists(filePath);
-    if (!exists) return res.json([]);
-    const data = JSON.parse(await fs.readFile(filePath, "utf-8"));
-    return res.json(Array.isArray(data) ? data : []);
+    const list = await readList();
+    return res.json(list);
   } catch (e) {
     console.error("Erreur lecture NKNEWS:", e);
     return res.json([]);
   }
 });
 
-router.post("/", async (req, res) => {
+function requireAdmin(req: any, res: any): boolean {
   const configuredKey = process.env.ADMIN_API_KEY;
   const providedKey = req.header("x-admin-key");
   if (configuredKey && providedKey !== configuredKey) {
-    return res.status(401).json({ message: "Clé administrateur requise." });
+    res.status(401).json({ message: "Clé administrateur requise." });
+    return false;
   }
+  return true;
+}
+
+router.post("/", async (req, res) => {
+  if (!requireAdmin(req, res)) return;
   try {
-    const newArticle = req.body ?? {};
-    const entry = {
-      title: newArticle.title ?? "",
-      content: newArticle.content ?? "",
-      image: newArticle.image ?? "",
-      createdAt: new Date().toISOString(),
-    };
-
-    const exists = await fs.pathExists(filePath);
-    let articles: unknown = [];
-    if (exists) {
-      articles = JSON.parse(await fs.readFile(filePath, "utf-8"));
-    } else {
-      await fs.ensureFile(filePath);
-    }
-
-    const list = Array.isArray(articles) ? articles : [];
+    const { title = "", content = "", image = "" } = req.body ?? {};
+    const entry = { id: randomUUID(), title, content, image, createdAt: new Date().toISOString() };
+    const list = await readList();
     list.unshift(entry);
-    await fs.writeFile(filePath, JSON.stringify(list, null, 2), "utf-8");
-    return res.json({ success: true });
+    await writeList(list);
+    return res.json({ success: true, article: entry });
   } catch (e) {
     console.error("Erreur écriture NKNEWS:", e);
+    return res.status(500).json({ success: false });
+  }
+});
+
+router.patch("/:id", async (req, res) => {
+  if (!requireAdmin(req, res)) return;
+  const { id } = req.params;
+  try {
+    const list = await readList();
+    const index = list.findIndex((it) => it.id === id);
+    if (index === -1) return res.status(404).json({ message: "Article introuvable." });
+    const { title, content, image } = req.body ?? {};
+    list[index] = { ...list[index], ...(title !== undefined ? { title } : {}), ...(content !== undefined ? { content } : {}), ...(image !== undefined ? { image } : {}) };
+    await writeList(list);
+    return res.json({ success: true, article: list[index] });
+  } catch (e) {
+    console.error("Erreur mise à jour NKNEWS:", e);
+    return res.status(500).json({ success: false });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  if (!requireAdmin(req, res)) return;
+  const { id } = req.params;
+  try {
+    const list = await readList();
+    const next = list.filter((it) => it.id !== id);
+    if (next.length === list.length) return res.status(404).json({ message: "Article introuvable." });
+    await writeList(next);
+    return res.status(204).send();
+  } catch (e) {
+    console.error("Erreur suppression NKNEWS:", e);
     return res.status(500).json({ success: false });
   }
 });

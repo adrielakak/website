@@ -68,11 +68,12 @@ function Admin() {
   const [reservationSessionDrafts, setReservationSessionDrafts] = useState<Record<string, string>>({});
   const [reservationStatusDrafts, setReservationStatusDrafts] = useState<Record<string, AdminReservationStatus>>({});
   const [updatingReservationId, setUpdatingReservationId] = useState<string | null>(null);
-  const [nknews, setNknews] = useState<Array<{ title?: string; content?: string; image?: string; createdAt?: string }>>([]);
+  const [nknews, setNknews] = useState<Array<{ id?: string; title?: string; content?: string; image?: string; createdAt?: string }>>([]);
   const [nkTitle, setNkTitle] = useState("");
   const [nkContent, setNkContent] = useState("");
   const [nkImage, setNkImage] = useState("");
   const [nkFile, setNkFile] = useState<File | null>(null);
+  const [editNewsId, setEditNewsId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const [newSessionFormationId, setNewSessionFormationId] = useState("");
@@ -95,7 +96,7 @@ function Admin() {
         apiClient.get<{ messages: AdminContactMessage[] }>("/api/admin/contact", {
           headers: { "x-admin-key": key },
         }),
-        apiClient.get<Array<{ title?: string; content?: string; image?: string; createdAt?: string }>>("/api/nknews"),
+        apiClient.get<Array<{ id?: string; title?: string; content?: string; image?: string; createdAt?: string }>>("/api/nknews"),
       ]);
 
       setAvailability(availabilityResponse.data.sessions);
@@ -132,49 +133,55 @@ function Admin() {
   };
 
   const addNknews = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      if (!adminKey) {
-        setErrorMessage("Connectez-vous d'abord avec la clé administrateur.");
-        return;
-      }
-      let imageUrl = nkImage.trim();
-      if (nkFile) {
-        setIsUploading(true);
-        const formData = new FormData();
-        formData.append("file", nkFile);
-        const uploadRes = await apiClient.post(
-          "/api/uploads/image",
-          formData,
-          { headers: { "x-admin-key": adminKey } }
-        );
-        imageUrl = uploadRes.data?.url ?? imageUrl;
-      }
-
-      await apiClient.post(
-        "/api/nknews",
-        {
-          title: nkTitle.trim(),
-          content: nkContent.trim(),
-          image: imageUrl,
-        },
+  event.preventDefault();
+  try {
+    if (!adminKey) {
+      setErrorMessage("Connectez-vous d'abord avec la clé administrateur.");
+      return;
+    }
+    let imageUrl = nkImage.trim();
+    if (nkFile) {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("file", nkFile);
+      const uploadRes = await apiClient.post(
+        "/api/uploads/image",
+        formData,
         { headers: { "x-admin-key": adminKey } }
       );
-      setNkTitle("");
-      setNkContent("");
-      setNkImage("");
-      setNkFile(null);
-      const res = await apiClient.get<Array<{ title?: string; content?: string; image?: string; createdAt?: string }>>(
-        "/api/nknews"
-      );
-      setNknews(res.data ?? []);
-    } catch (e) {
-      console.error("Erreur ajout NKNEWS:", e);
-      setErrorMessage("Impossible d'ajouter l'actualité.");
-    } finally {
-      setIsUploading(false);
+      imageUrl = uploadRes.data?.url ?? imageUrl;
     }
-  };
+
+    if (editNewsId) {
+      await apiClient.patch(
+        `/api/nknews/${editNewsId}`,
+        { title: nkTitle.trim(), content: nkContent.trim(), image: imageUrl },
+        { headers: { "x-admin-key": adminKey } }
+      );
+    } else {
+      await apiClient.post(
+        "/api/nknews",
+        { title: nkTitle.trim(), content: nkContent.trim(), image: imageUrl },
+        { headers: { "x-admin-key": adminKey } }
+      );
+    }
+
+    setNkTitle("");
+    setNkContent("");
+    setNkImage("");
+    setNkFile(null);
+    setEditNewsId(null);
+    const res = await apiClient.get<Array<{ id?: string; title?: string; content?: string; image?: string; createdAt?: string }>>(
+      "/api/nknews"
+    );
+    setNknews(res.data ?? []);
+  } catch (e) {
+    console.error("Erreur ajout/màj NKNEWS:", e);
+    setErrorMessage("Impossible d'enregistrer l'actualité.");
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   const addSession = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -210,7 +217,29 @@ function Admin() {
     }
   };
 
-  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+    const handleNewsEdit = (item: { id?: string; title?: string; content?: string; image?: string }) => {
+    setNkTitle(item.title ?? "");
+    setNkContent(item.content ?? "");
+    setNkImage(item.image ?? "");
+    setNkFile(null);
+    setEditNewsId(item.id ?? null);
+  };
+
+  const handleNewsDelete = async (id?: string) => {
+    if (!id || !adminKey) return;
+    const ok = window.confirm("Supprimer définitivement cette actualité ?");
+    if (!ok) return;
+    try {
+      await apiClient.delete(`/api/nknews/${id}`, { headers: { "x-admin-key": adminKey } });
+      const res = await apiClient.get<Array<{ id?: string; title?: string; content?: string; image?: string; createdAt?: string }>>(
+        "/api/nknews"
+      );
+      setNknews(res.data ?? []);
+    } catch (e) {
+      console.error("Erreur suppression NKNEWS:", e);
+      setErrorMessage("Suppression impossible.");
+    }
+  };const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!adminKeyInput.trim()) {
       setErrorMessage("Merci de renseigner la clé administrateur.");
@@ -920,6 +949,11 @@ const updateAvailability = async (
 }
 
 export default Admin;
+
+
+
+
+
 
 
 

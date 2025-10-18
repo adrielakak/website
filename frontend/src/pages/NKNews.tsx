@@ -37,7 +37,7 @@ export default function NKNews() {
       {!loading && !error && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {articles.map((item, i) => (
-            <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div key={i} className="rounded-xl border border-white/10 bg-white/[0.98] text-gray-900 shadow-md overflow-hidden">
               {item.image && (
                 <img
                   src={item.image.startsWith("/") ? `${API_BASE_URL}${item.image}` : item.image}
@@ -46,8 +46,8 @@ export default function NKNews() {
                 />
               )}
               <div className="p-4">
-                {item.title && <h2 className="font-semibold mb-2">{item.title}</h2>}
-                {item.content && <p className="text-white/80 whitespace-pre-line">{item.content}</p>}
+                {item.title && <h2 className="font-semibold mb-2 text-gray-900">{item.title}</h2>}
+                {item.content && <p className="text-gray-700 whitespace-pre-line">{item.content}</p>}
               </div>
             </div>
           ))}
@@ -59,4 +59,5 @@ export default function NKNews() {
     </div>
   );
 }
+
 
