@@ -1,4 +1,4 @@
-import axios from "axios";
+﻿import axios from "axios";
 
 const DEFAULT_RENDER_API = "https://nathalie-bkuv.onrender.com";
 
@@ -23,10 +23,9 @@ const API_BASE_URL = resolveApiBaseUrl();
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  
   timeout: 10000,
 });
 
 export { API_BASE_URL };
+

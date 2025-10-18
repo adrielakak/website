@@ -789,7 +789,7 @@ const updateAvailability = async (
                                 [reservation.id]: event.target.value,
                               }))
                             }
-                            className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                            className="rounded-xl border border-brand-primary/40 bg-brand-midnight px-3 py-2 text-xs text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
                           >
                             {sessionOptions.map((option) => (
                               <option
@@ -814,7 +814,7 @@ const updateAvailability = async (
                                 [reservation.id]: event.target.value as AdminReservationStatus,
                               }))
                             }
-                            className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                            className="rounded-xl border border-brand-primary/40 bg-brand-midnight px-3 py-2 text-xs text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
                           >
                             {RESERVATION_STATUS_OPTIONS.map((statusOption) => (
                               <option key={statusOption} value={statusOption}>
@@ -920,6 +920,7 @@ const updateAvailability = async (
 }
 
 export default Admin;
+
 
 
 

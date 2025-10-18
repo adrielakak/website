@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { apiClient, API_BASE_URL } from "../lib/api";
 
 interface NKNewsItem {
@@ -21,7 +21,7 @@ export default function NKNews() {
         setError(null);
       } catch (e) {
         console.error(e);
-        setError("Impossible de charger les actualités pour le moment.");
+        setError("Impossible de charger les actualitÃ©s pour le moment.");
       } finally {
         setLoading(false);
       }
@@ -30,9 +30,9 @@ export default function NKNews() {
   }, []);
 
   return (
-    <div className="p-8 space-y-8 bg-gray-50 min-h-screen">
+    <div className="bg-brand-midnight text-white min-h-screen p-8 space-y-8">
       <h1 className="text-3xl font-bold text-center">NKNEWS</h1>
-      {loading && <p className="text-center text-gray-500">Chargement…</p>}
+      {loading && <p className="text-center text-gray-500">Chargementâ€¦</p>}
       {error && <p className="text-center text-red-600">{error}</p>}
       {!loading && !error && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -47,15 +47,16 @@ export default function NKNews() {
               )}
               <div className="p-4">
                 {item.title && <h2 className="font-semibold mb-2">{item.title}</h2>}
-                {item.content && <p className="text-gray-700 whitespace-pre-line">{item.content}</p>}
+                {item.content && <p className="text-white/80 whitespace-pre-line">{item.content}</p>}
               </div>
             </div>
           ))}
           {articles.length === 0 && (
-            <p className="col-span-full text-center text-gray-500">Aucune actualité pour le moment.</p>
+            <p className="col-span-full text-center text-gray-500">Aucune actualitÃ© pour le moment.</p>
           )}
         </div>
       )}
     </div>
   );
 }
+
