@@ -1,10 +1,15 @@
-import { randomUUID } from "crypto";
+﻿import { randomUUID } from "crypto";
 import fs from "fs-extra";
 
 import { resolveDataPath } from "./storagePaths.js";
 
 export type PaymentMethod = "stripe" | "virement";
-export type ReservationStatus = "stripe_pending" | "stripe_confirmed" | "virement_en_attente" | "cancelled";
+export type ReservationStatus =
+  | "stripe_pending"
+  | "stripe_confirmed"
+  | "virement_en_attente"
+  | "virement_confirme"
+  | "cancelled";
 
 export interface ReservationRecord {
   id: string;
@@ -21,7 +26,12 @@ export interface ReservationRecord {
 }
 
 const RESERVATIONS_PATH = resolveDataPath("reservations.json");
-const ACTIVE_STATUSES: ReservationStatus[] = ["stripe_pending", "stripe_confirmed", "virement_en_attente"];
+const ACTIVE_STATUSES: ReservationStatus[] = [
+  "stripe_pending",
+  "stripe_confirmed",
+  "virement_en_attente",
+  "virement_confirme",
+];
 const PENDING_TIMEOUT_MINUTES = Number.parseFloat(process.env.STRIPE_PENDING_TIMEOUT_MINUTES ?? "5");
 const PENDING_TIMEOUT_MS = Number.isFinite(PENDING_TIMEOUT_MINUTES) && PENDING_TIMEOUT_MINUTES > 0
   ? PENDING_TIMEOUT_MINUTES * 60 * 1000
@@ -197,3 +207,5 @@ export async function deleteReservationById(id: string): Promise<boolean> {
   await writeReservations(reservations);
   return true;
 }
+
+

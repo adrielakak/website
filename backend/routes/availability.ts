@@ -1,4 +1,4 @@
-import { Router } from "express";
+﻿import { Router } from "express";
 
 import { getFormations } from "../services/formationsService.js";
 import { getAvailabilityList } from "../services/availabilityService.js";
@@ -10,7 +10,7 @@ router.get("/", async (_req, res) => {
   try {
     const formations = await getFormations();
     const [availability, reservations] = await Promise.all([getAvailabilityList(formations), readReservations()]);
-    const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente"]);
+    const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente", "virement_confirme"]);
 
     const sessions = availability.map((item) => {
       const reservedCount = reservations.filter(
@@ -40,3 +40,4 @@ router.get("/", async (_req, res) => {
 });
 
 export default router;
+

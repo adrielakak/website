@@ -139,7 +139,7 @@ app.post("/api/reservations/manage", async (req, res) => {
         }
         const formations = await getFormations();
         const [availabilityList, reservations] = await Promise.all([getAvailabilityList(formations), readReservations()]);
-        const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente"]);
+        const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente", "virement_confirme"]);
         const sessions = availabilityList
             .filter((session) => session.formationId === reservation.formationId)
             .map((session) => {

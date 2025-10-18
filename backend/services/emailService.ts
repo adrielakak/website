@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+﻿import nodemailer from "nodemailer";
 
 // Types alignés avec le stockage de réservation
 interface ReservationRecord {
@@ -82,7 +82,9 @@ export async function sendReservationConfirmationEmail({
     reason === "changed"
       ? "Votre changement de session est confirmé."
       : paymentStatus === "confirmed"
-      ? "Votre paiement a bien été reçu."
+      ? (reservation.paymentMethod === "virement"
+          ? "Votre virement a bien été reçu. Votre inscription est confirmée."
+          : "Votre paiement a bien été reçu.")
       : "Votre réservation est enregistrée et en attente de validation du paiement.";
 
   const html = `
@@ -181,3 +183,4 @@ ID de réservation : ${reservation.id}
   await mailer.sendMail({ from, to: reservation.customerEmail, bcc: adminCopy ?? undefined, subject, text, html });
   console.log(`Email d'annulation envoyé à ${reservation.customerEmail}`);
 }
+

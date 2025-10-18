@@ -2,7 +2,12 @@ import { randomUUID } from "crypto";
 import fs from "fs-extra";
 import { resolveDataPath } from "./storagePaths.js";
 const RESERVATIONS_PATH = resolveDataPath("reservations.json");
-const ACTIVE_STATUSES = ["stripe_pending", "stripe_confirmed", "virement_en_attente"];
+const ACTIVE_STATUSES = [
+    "stripe_pending",
+    "stripe_confirmed",
+    "virement_en_attente",
+    "virement_confirme",
+];
 const PENDING_TIMEOUT_MINUTES = Number.parseFloat(process.env.STRIPE_PENDING_TIMEOUT_MINUTES ?? "5");
 const PENDING_TIMEOUT_MS = Number.isFinite(PENDING_TIMEOUT_MINUTES) && PENDING_TIMEOUT_MINUTES > 0
     ? PENDING_TIMEOUT_MINUTES * 60 * 1000

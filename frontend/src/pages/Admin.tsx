@@ -16,7 +16,7 @@ interface AdminAvailabilityItem {
   isCancelled: boolean;
 }
 
-type AdminReservationStatus = "stripe_pending" | "stripe_confirmed" | "virement_en_attente" | "cancelled";
+type AdminReservationStatus = "stripe_pending" | "stripe_confirmed" | "virement_en_attente" | "virement_confirme" | "cancelled";
 
 interface AdminReservation {
   id: string;
@@ -45,13 +45,15 @@ const RESERVATION_STATUS_OPTIONS: AdminReservationStatus[] = [
   "stripe_pending",
   "stripe_confirmed",
   "virement_en_attente",
+  "virement_confirme",
   "cancelled",
 ];
 
 const RESERVATION_STATUS_LABELS: Record<AdminReservationStatus, string> = {
-  stripe_pending: "Stripe — en attente",
-  stripe_confirmed: "Stripe — confirmé",
-  virement_en_attente: "Virement — en attente",
+  stripe_pending: "Stripe - en attente",
+  stripe_confirmed: "Stripe - confirmé",
+  virement_en_attente: "Virement - en attente",
+  virement_confirme: "Virement - confirmé",
   cancelled: "Annulée",
 };
 
@@ -80,6 +82,7 @@ function Admin() {
     "stripe_pending",
     "stripe_confirmed",
     "virement_en_attente",
+    "virement_confirme",
   ];
 
   const [newSessionFormationId, setNewSessionFormationId] = useState("");
@@ -834,7 +837,7 @@ const updateAvailability = async (
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {reservations.map((reservation) => {
+                {reservations.filter((r) => ACTIVE_RES_STATUS.includes(r.status)).map((reservation) => {
                   const sessionDraft = reservationSessionDrafts[reservation.id] ?? reservation.sessionId;
                   const statusDraft = reservationStatusDrafts[reservation.id] ?? reservation.status;
                   const sessionOptions = sessionsByFormation[reservation.formationId] ?? [];
@@ -862,7 +865,7 @@ const updateAvailability = async (
                       <td className="px-4 py-3">
                         <span
                           className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                            reservation.status === "stripe_confirmed"
+                            reservation.status === "stripe_confirmed" || reservation.status === "virement_confirme"
                               ? "bg-emerald-400/15 text-emerald-200"
                               : reservation.status === "stripe_pending"
                               ? "bg-amber-400/15 text-amber-200"
@@ -1015,6 +1018,13 @@ const updateAvailability = async (
 }
 
 export default Admin;
+
+
+
+
+
+
+
 
 
 

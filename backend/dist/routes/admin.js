@@ -27,7 +27,7 @@ router.get("/availability", async (_req, res) => {
             getAvailabilityList(formations),
             readReservations(),
         ]);
-        const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente"]);
+        const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente", "virement_confirme"]);
         const sessions = availability.map((item) => {
             const reservedCount = reservations.filter((reservation) => reservation.sessionId === item.sessionId && activeStatuses.has(reservation.status)).length;
             return {
@@ -147,7 +147,7 @@ router.patch("/reservations/:id", async (req, res) => {
             updates.sessionLabel = sessionOption.label;
         }
         if (status) {
-            const allowedStatuses = ["stripe_pending", "stripe_confirmed", "virement_en_attente", "cancelled"];
+            const allowedStatuses = ["stripe_pending", "stripe_confirmed", "virement_en_attente", "virement_confirme", "cancelled"];
             if (!allowedStatuses.includes(status)) {
                 return res.status(400).json({ message: "Statut de réservation invalide." });
             }
@@ -156,10 +156,12 @@ router.patch("/reservations/:id", async (req, res) => {
         const updated = await updateReservationById(id, updates);
         if (updated) {
             try {
+                const reason = sessionId ? "changed" : undefined;
+                const paymentStatus = (updated.status === "stripe_confirmed" || updated.status === "virement_confirme") ? "confirmed" : "pending";
                 await sendReservationConfirmationEmail({
                     reservation: updated,
-                    paymentStatus: updated.status === "stripe_confirmed" ? "confirmed" : "pending",
-                    reason: "changed",
+                    paymentStatus,
+                    ...(reason ? { reason } : {}),
                 });
             }
             catch (e) {
@@ -167,7 +169,7 @@ router.patch("/reservations/:id", async (req, res) => {
             }
         }
         if (!updated) {
-            return res.status(404).json({ message: "Réservation introuvable." });
+            return res.status(404).json({ message: "R�servation introuvable." });
         }
         res.json({ reservation: updated });
     }

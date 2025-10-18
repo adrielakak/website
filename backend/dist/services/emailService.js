@@ -41,7 +41,9 @@ export async function sendReservationConfirmationEmail({ reservation, paymentSta
     const statusLabel = reason === "changed"
         ? "Votre changement de session est confirmé."
         : paymentStatus === "confirmed"
-            ? "Votre paiement a bien été reçu."
+            ? (reservation.paymentMethod === "virement"
+                ? "Votre virement a bien été reçu. Votre inscription est confirmée."
+                : "Votre paiement a bien été reçu.")
             : "Votre réservation est enregistrée et en attente de validation du paiement.";
     const html = `
     <div style="font-family: Arial, sans-serif; color: #222; line-height: 1.6;">

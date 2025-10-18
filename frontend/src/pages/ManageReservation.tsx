@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import AnimatedContent from "../components/reactbits/AnimatedContent";
 import { apiClient } from "../lib/api";
 
-type ReservationStatus = "stripe_pending" | "stripe_confirmed" | "virement_en_attente" | "cancelled";
+type ReservationStatus = "stripe_pending" | "stripe_confirmed" | "virement_en_attente" | "virement_confirme" | "cancelled";
 
 interface ManagedReservation {
   id: string;
@@ -59,9 +59,10 @@ function ManageReservation() {
   );
 
   const statusLabels: Record<ReservationStatus, string> = {
-    stripe_pending: "Stripe — en attente",
-    stripe_confirmed: "Stripe — confirmé",
-    virement_en_attente: "Virement — en attente",
+    stripe_pending: "Stripe - en attente",
+    stripe_confirmed: "Stripe - confirmé",
+    virement_en_attente: "Virement - en attente",
+    virement_confirme: "Virement - confirmé",
     cancelled: "Annulée",
   };
 
@@ -371,6 +372,8 @@ function ManageReservation() {
 }
 
 export default ManageReservation;
+
+
 
 
 

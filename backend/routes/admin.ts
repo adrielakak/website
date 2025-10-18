@@ -49,7 +49,7 @@ router.get("/availability", async (_req, res) => {
       getAvailabilityList(formations),
       readReservations(),
     ]);
-    const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente"]);
+    const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente", "virement_confirme"]);
 
     const sessions = availability.map((item) => {
       const reservedCount = reservations.filter(
@@ -192,7 +192,7 @@ router.patch("/reservations/:id", async (req, res) => {
     }
 
     if (status) {
-      const allowedStatuses: ReservationStatus[] = ["stripe_pending", "stripe_confirmed", "virement_en_attente", "cancelled"];
+      const allowedStatuses: ReservationStatus[] = ["stripe_pending", "stripe_confirmed", "virement_en_attente", "virement_confirme", "cancelled"];
       if (!allowedStatuses.includes(status)) {
         return res.status(400).json({ message: "Statut de réservation invalide." });
       }
@@ -202,19 +202,21 @@ router.patch("/reservations/:id", async (req, res) => {
     const updated = await updateReservationById(id, updates);
     if (updated) {
       try {
+        const reason = sessionId ? "changed" : undefined;
+        const paymentStatus = (updated.status === "stripe_confirmed" || updated.status === "virement_confirme") ? "confirmed" : "pending";
         await sendReservationConfirmationEmail({
           reservation: updated as any,
-          paymentStatus: updated.status === "stripe_confirmed" ? "confirmed" : "pending",
-          reason: "changed",
-        });
+          paymentStatus,
+          ...(reason ? { reason } : {}),
+        } as any);
       } catch (e) {
         console.warn("E-mail de confirmation non envoyé après changement (admin):", e);
       }
     }
-    if (!updated) {
-      return res.status(404).json({ message: "Réservation introuvable." });
-    }
 
+    if (!updated) {
+      return res.status(404).json({ message: "R�servation introuvable." });
+    }
     res.json({ reservation: updated });
   } catch (error) {
     console.error("Erreur admin/reservations:update:", error);
@@ -311,3 +313,5 @@ router.delete("/reservations/:id", async (req, res) => {
   }
 });
 export default router;
+
+

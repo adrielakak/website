@@ -7,7 +7,7 @@ router.get("/", async (_req, res) => {
     try {
         const formations = await getFormations();
         const [availability, reservations] = await Promise.all([getAvailabilityList(formations), readReservations()]);
-        const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente"]);
+        const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente", "virement_confirme"]);
         const sessions = availability.map((item) => {
             const reservedCount = reservations.filter((reservation) => reservation.sessionId === item.sessionId && activeStatuses.has(reservation.status)).length;
             return {
