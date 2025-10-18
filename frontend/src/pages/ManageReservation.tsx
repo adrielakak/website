@@ -243,7 +243,7 @@ function ManageReservation() {
                   type="text"
                   value={reservationIdInput}
                   onChange={(e) => setReservationIdInput(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                  className="mt-2 w-full rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3 text-base text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 sm:text-sm"
                   placeholder="Ex : c076f596-34fa..."
                 />
               </div>
@@ -256,7 +256,7 @@ function ManageReservation() {
                   type="email"
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                  className="mt-2 w-full rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3 text-base text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 sm:text-sm"
                   placeholder="email@example.com"
                 />
               </div>
@@ -306,7 +306,7 @@ function ManageReservation() {
                     id="new-session"
                     value={selectedSessionId}
                     onChange={(e) => setSelectedSessionId(e.target.value)}
-                    className="mt-2 w-full rounded-2xl border border-brand-primary/40 bg-brand-midnight px-4 py-3 text-sm text-white focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+                    className="mt-2 w-full rounded-2xl border border-brand-primary/40 bg-brand-midnight px-4 py-3 text-base text-white focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/40 sm:text-sm"
                   >
                     {upcomingSessions.length === 0 && <option value="">Aucune session disponible pour le moment</option>}
                     {upcomingSessions.map((s) => (
