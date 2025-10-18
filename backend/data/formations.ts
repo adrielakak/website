@@ -24,7 +24,7 @@ export const formations: Formation[] = [
     description:
       "Un week-end de 12 heures pour explorer le jeu d'acteur, travailler la voix et découvrir les coulisses du doublage avec Nathalie Karsenti.",
     duration: "12 h (week-end)",
-    price: 1,
+    price: 0,
     location: "8 rue Mercoeur, 44000 Nantes",
     teacher: "Nathalie Karsenti",
     objectives: [
