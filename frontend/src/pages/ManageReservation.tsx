@@ -1,4 +1,4 @@
-﻿﻿import { FormEvent, useMemo, useState } from "react";
+﻿?import { FormEvent, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import AnimatedContent from "../components/reactbits/AnimatedContent";
@@ -26,8 +26,7 @@ interface ManagedSession {
   endDate: string;
   capacity: number;
   isOpen: boolean;
-  isCancelled: boolean;
-  reservedCount: number;
+  iscancelled: "Annulée",\n  };
   remaining: number;
 }
 
@@ -59,22 +58,21 @@ function ManageReservation() {
   );
 
   const statusLabels: Record<ReservationStatus, string> = {
-    stripe_pending: "Stripe â€” en attente",
-    stripe_confirmed: "Stripe â€” confirmÃ©",
-    virement_en_attente: "Virement â€” en attente",
-    cancelled: "AnnulÃ©e",
-  };
+    stripe_pending: "Stripe \u2014 en attente",
+    stripe_confirmed: "Stripe \u2014 confirmé",
+    virement_en_attente: "Virement \u2014 en attente",
+    cancelled: "Annulée",\n  };
 
   const formatSessionPeriod = (session?: ManagedSession): string => {
     if (!session) {
-      return "Dates communiquÃ©es prochainement";
+      return "Dates communiquées prochainement";
     }
     const start = new Date(session.startDate);
     const end = new Date(session.endDate);
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
       return session.sessionLabel;
     }
-    return `${sessionDateFormatter.format(start)} â€¢ ${sessionDateFormatter.format(end)}`;
+    return `${sessionDateFormatter.format(start)} — ${sessionDateFormatter.format(end)}`;
   };
 
   const extractErrorMessage = (error: unknown, fallback: string): string => {
@@ -123,7 +121,7 @@ function ManageReservation() {
       return response.data;
     } catch (error) {
       if (!silent) {
-        setLookupError(extractErrorMessage(error, "RÃ©servation introuvable. VÃ©rifiez les informations saisies."));
+        setLookupError(extractErrorMessage(error, "Réservation introuvable. Vérifiez les informations saisies."));
       }
       throw error;
     } finally {
@@ -136,14 +134,14 @@ function ManageReservation() {
   const handleLookup = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!reservationIdInput.trim() || !emailInput.trim()) {
-      setLookupError("Merci de renseigner votre email et l'identifiant de rÃ©servation.");
+      setLookupError("Merci de renseigner votre email et l'identifiant de réservation.");
       return;
     }
 
     try {
       await performLookup(reservationIdInput, emailInput);
     } catch (error) {
-      console.error("Erreur lookup rÃ©servation:", error);
+      console.error("Erreur lookup réservation:", error);
     }
   };
 
@@ -159,7 +157,7 @@ function ManageReservation() {
     }
 
     if (selectedSessionId === reservation.sessionId) {
-      setUpdateError("Votre rÃ©servation est dÃ©jÃ  positionnÃ©e sur cette session.");
+      setUpdateError("Votre réservation est déjà positionnée sur cette session.");
       return;
     }
 
@@ -187,12 +185,12 @@ function ManageReservation() {
       });
 
       await performLookup(reservation.id, reservation.customerEmail, { silent: true });
-      setSuccessMessage(response.data.message ?? "Votre changement de session est confirmÃ©.");
+      setSuccessMessage(response.data.message ?? "Votre changement de session est confirmé.");
     } catch (error) {
       setUpdateError(
         extractErrorMessage(
           error,
-          "Impossible de modifier la rÃ©servation pour le moment. RÃ©essayez un peu plus tard."
+          "Impossible de modifier la réservation pour le moment. Réessayez un peu plus tard."
         )
       );
     } finally {
@@ -211,18 +209,15 @@ function ManageReservation() {
         <div className="relative mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-24">
           <AnimatedContent distance={90}>
             <div className="space-y-6">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.45em] text-white/60 sm:text-xs">
-                GÃ©rer ma rÃ©servation
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.45em] text-white/60 sm:text-xs">
+                Gérer ma réservation
               </p>
               <h1 className="text-3xl font-semibold text-white sm:text-4xl">
-                Changer de session ou vÃ©rifier votre inscription
+                Changer de session ou vérifier votre inscription
               </h1>
               <p className="max-w-2xl text-sm text-white/70 sm:text-base">
-                Saisissez l&apos;identifiant communiquÃ© dans votre email de confirmation ainsi que votre adresse mail.
-                Vous pourrez ensuite choisir une autre session encore disponible. En cas de difficultÃ©,{" "}
-                <Link to="/contact" className="text-brand-gold hover:underline">
-                  contactez-nous directement
-                </Link>.
+                Saisissez l&apos;identifiant communiqué dans votre email de confirmation ainsi que votre adresse mail.
+                Vous pourrez ensuite choisir une autre session encore disponible. En cas de difficulté, <Link to="/contact" className="text-brand-gold hover:underline">contactez-nous directement</Link>.
               </p>
             </div>
           </AnimatedContent>
@@ -232,15 +227,15 @@ function ManageReservation() {
       <div className="mx-auto mt-12 max-w-5xl space-y-8 px-4 sm:px-6">
         <AnimatedContent distance={70}>
           <div className="rounded-[32px] border border-white/10 bg-white/[0.04] p-6 shadow-glow-soft sm:p-8">
-            <h2 className="text-2xl font-semibold text-white">Retrouver ma rÃ©servation</h2>
+            <h2 className="text-2xl font-semibold text-white">Retrouver ma réservation</h2>
             <p className="mt-2 text-sm text-white/70">
-              L&apos;identifiant ressemble Ã  <span className="font-mono text-white/80">8f5a2-...</span> et se trouve dans
-              l&apos;email de confirmation envoyÃ© aprÃ¨s votre inscription.
+              L&apos;identifiant ressemble à  <span className="font-mono text-white/80">8f5a2-...</span> et se trouve dans
+              l&apos;email de confirmation envoyé après votre inscription.
             </p>
             <form className="mt-6 grid gap-4 sm:grid-cols-2" onSubmit={handleLookup}>
               <div className="sm:col-span-1">
                 <label htmlFor="reservation-id" className="text-xs font-semibold uppercase tracking-[0.3em] text-white/60">
-                  Identifiant de rÃ©servation
+                  Identifiant de réservation
                 </label>
                 <input
                   id="reservation-id"
@@ -253,7 +248,7 @@ function ManageReservation() {
               </div>
               <div className="sm:col-span-1">
                 <label htmlFor="reservation-email" className="text-xs font-semibold uppercase tracking-[0.3em] text-white/60">
-                  Adresse email utilisÃ©e
+                  Adresse email utilisée
                 </label>
                 <input
                   id="reservation-email"
@@ -270,7 +265,7 @@ function ManageReservation() {
                   className="btn-primary inline-flex items-center gap-2 text-xs uppercase tracking-[0.4em]"
                   disabled={isLookupLoading}
                 >
-                  {isLookupLoading ? "Recherche..." : "Afficher ma rÃ©servation"}
+                  {isLookupLoading ? "Recherche..." : "Afficher ma réservation"}
                 </button>
               </div>
             </form>
@@ -287,14 +282,14 @@ function ManageReservation() {
             <div className="rounded-[32px] border border-white/10 bg-white/[0.04] p-6 shadow-glow-soft sm:p-8">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.35em] text-brand-gold/80">RÃ©servation confirmÃ©e</p>
+                  <p className="text-xs uppercase tracking-[0.35em] text-brand-gold/80">Réservation confirmée</p>
                   <h3 className="mt-2 text-2xl font-semibold text-white">{reservation.formationTitle}</h3>
                   <p className="mt-1 text-sm text-white/60">
-                    {reservation.customerName} â€” {reservation.customerEmail}
+                    {reservation.customerName} — {reservation.customerEmail}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3 text-xs uppercase tracking-[0.3em] text-white/60">
-                  CrÃ©Ã©e le {dateFormatter.format(new Date(reservation.createdAt))}
+                  Créée le {dateFormatter.format(new Date(reservation.createdAt))}
                 </div>
               </div>
 
@@ -341,15 +336,15 @@ function ManageReservation() {
                         {session.isOpen
                           ? session.remaining > 0
                             ? ""
-                            : " â€” complet"
-                          : " â€” session fermÃ©e"}
+                            : " — complet"
+                          : " — session fermée"}
                       </option>
                     ))}
                     {cancelledSessions.length > 0 && (
-                      <optgroup label="Sessions annulÃ©es">
+                      <optgroup label="Sessions annulées">
                         {cancelledSessions.map((session) => (
                           <option key={session.sessionId} value={session.sessionId} disabled>
-                            {session.sessionLabel} â€” annulÃ©e
+                            {session.sessionLabel} — annulée
                           </option>
                         ))}
                       </optgroup>
@@ -370,10 +365,10 @@ function ManageReservation() {
                       (selectedSession?.remaining ?? 0) <= 0
                     }
                   >
-                    {isUpdating ? "Mise Ã  jour..." : "Changer de session"}
+                    {isUpdating ? "Mise à jour..." : "Changer de session"}
                   </button>
                   <span className="text-xs text-white/50">
-                    La place libÃ©rÃ©e est immÃ©diatement proposÃ©e aux autres participants.
+                    La place libérée est immédiatement proposée aux autres participants.
                   </span>
                 </div>
 
@@ -403,6 +398,17 @@ function ManageReservation() {
 }
 
 export default ManageReservation;
+
+
+
+
+
+
+
+
+
+
+
 
 
 
