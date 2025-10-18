@@ -56,6 +56,7 @@ export async function addReservation(input) {
     const record = {
         id: randomUUID(),
         createdAt: new Date().toISOString(),
+        sessionChangeCount: 0,
         ...input,
     };
     reservations.push(record);
@@ -88,6 +89,9 @@ export async function updateReservationByStripeSession(stripeSessionId, updates)
     const next = {
         ...current,
         ...updates,
+        sessionChangeCount: updates.sessionChangeCount !== undefined
+            ? updates.sessionChangeCount
+            : current.sessionChangeCount ?? 0,
     };
     reservations[index] = next;
     await writeReservations(reservations);
@@ -106,6 +110,9 @@ export async function updateReservationById(reservationId, updates) {
     const next = {
         ...current,
         ...updates,
+        sessionChangeCount: updates.sessionChangeCount !== undefined
+            ? updates.sessionChangeCount
+            : current.sessionChangeCount ?? 0,
     };
     reservations[index] = next;
     await writeReservations(reservations);

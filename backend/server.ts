@@ -215,6 +215,7 @@ app.post("/api/reservations/manage", async (req, res) => {
       paymentMethod: reservation.paymentMethod,
       status: reservation.status,
       createdAt: reservation.createdAt,
+      sessionChangeCount: reservation.sessionChangeCount ?? 0,
     };
 
     return res.json({
@@ -332,6 +333,7 @@ app.post("/api/reservations/:reservationId/cancel", async (req, res) => {
       paymentMethod: updated.paymentMethod,
       status: updated.status,
       createdAt: updated.createdAt,
+      sessionChangeCount: updated.sessionChangeCount ?? 0,
     };
 
     return res.json({
@@ -353,6 +355,9 @@ await ensureAvailabilityDefaults(await getFormations());
 app.listen(PORT, () => {
   console.log(`Serveur Ateliers Théâtre de Nantes démarré sur le port ${PORT}`);
 });
+
+
+
 
 
 

@@ -23,6 +23,7 @@ export interface ReservationRecord {
   status: ReservationStatus;
   stripeSessionId?: string;
   createdAt: string;
+  sessionChangeCount?: number;
 }
 
 const RESERVATIONS_PATH = resolveDataPath("reservations.json");
@@ -100,6 +101,7 @@ export async function addReservation(input: ReservationInput): Promise<Reservati
   const record: ReservationRecord = {
     id: randomUUID(),
     createdAt: new Date().toISOString(),
+    sessionChangeCount: 0,
     ...input,
   };
   reservations.push(record);
@@ -129,6 +131,7 @@ export async function findReservationById(id: string): Promise<ReservationRecord
 }
 
 export interface ReservationUpdate {
+  sessionChangeCount?: number;
   status?: ReservationStatus;
   stripeSessionId?: string;
   sessionId?: string;
@@ -156,6 +159,10 @@ export async function updateReservationByStripeSession(
   const next: ReservationRecord = {
     ...current,
     ...updates,
+    sessionChangeCount:
+      updates.sessionChangeCount !== undefined
+        ? updates.sessionChangeCount
+        : current.sessionChangeCount ?? 0,
   };
 
   reservations[index] = next;
@@ -182,6 +189,10 @@ export async function updateReservationById(
   const next: ReservationRecord = {
     ...current,
     ...updates,
+    sessionChangeCount:
+      updates.sessionChangeCount !== undefined
+        ? updates.sessionChangeCount
+        : current.sessionChangeCount ?? 0,
   };
 
   reservations[index] = next;
@@ -207,5 +218,10 @@ export async function deleteReservationById(id: string): Promise<boolean> {
   await writeReservations(reservations);
   return true;
 }
+
+
+
+
+
 
 

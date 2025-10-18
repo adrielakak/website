@@ -167,6 +167,7 @@ app.post("/api/reservations/manage", async (req, res) => {
             paymentMethod: reservation.paymentMethod,
             status: reservation.status,
             createdAt: reservation.createdAt,
+            sessionChangeCount: reservation.sessionChangeCount ?? 0,
         };
         return res.json({
             reservation: sanitizedReservation,
@@ -273,6 +274,7 @@ app.patch("/api/reservations/:reservationId", async (req, res) => {
             paymentMethod: updated.paymentMethod,
             status: updated.status,
             createdAt: updated.createdAt,
+            sessionChangeCount: updated.sessionChangeCount ?? 0,
         };
         return res.json({
             message: "Votre changement de session est confirmé.",

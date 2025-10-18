@@ -17,6 +17,8 @@ interface ManagedReservation {
   paymentMethod: "stripe" | "virement";
   status: ReservationStatus;
   createdAt: string;
+  sessionChangeCount: number;
+
 }
 
 interface ManagedSession {
@@ -149,6 +151,10 @@ function ManageReservation() {
     }
     if (!targetSession.isOpen || targetSession.remaining <= 0) {
       setUpdateError("Cette session n'accepte plus d'inscriptions.");
+      return;
+    }
+    if ((reservation.sessionChangeCount ?? 0) >= 1) {
+      setUpdateError("Vous avez déjà modifié votre session une fois. Contactez-nous pour tout autre changement.");
       return;
     }
     try {
@@ -329,6 +335,7 @@ function ManageReservation() {
                       isUpdating ||
                       !selectedSessionId ||
                       selectedSessionId === reservation.sessionId ||
+                      reservation.sessionChangeCount >= 1 ||
                       upcomingSessions.length === 0 ||
                       !selectedSession?.isOpen ||
                       (selectedSession?.remaining ?? 0) <= 0
@@ -338,17 +345,13 @@ function ManageReservation() {
                   </button>
                   <span className="text-xs text-white/50">La place libérée est immédiatement proposée aux autres participants.</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-red-200 hover:bg-red-500/20 disabled:opacity-70"
-                    onClick={handleCancel}
-                    disabled={isUpdating}
-                  >
-                    {isUpdating ? "Annulation..." : "Annuler ma réservation"}
-                  </button>
-                  <span className="text-xs text-white/50">La place libérée sera immédiatement remise à disposition.</span>
-                </div>
+                <p className="text-xs text-white/50">
+                  {reservation.sessionChangeCount >= 1
+                    ? "Vous avez déjà utilisé votre changement de session. Contactez-nous pour toute demande supplémentaire."
+                    : "Vous pouvez changer de session une seule fois en autonomie."
+                  }
+                </p>
+                <p className="text-xs text-white/50">Pour toute annulation, merci de nous contacter directement.</p>
 
                 {updateError && (
                   <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{updateError}</p>
@@ -372,6 +375,13 @@ function ManageReservation() {
 }
 
 export default ManageReservation;
+
+
+
+
+
+
+
 
 
 
