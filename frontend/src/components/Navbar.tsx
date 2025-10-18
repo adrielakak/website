@@ -6,6 +6,7 @@ import GooeyNav from "./reactbits/GooeyNav";
 const navLinks = [
   { path: "/", label: "Accueil" },
   { path: "/formations", label: "Formations" },
+  { path: "/nknews", label: "NK NEWS" },
   { path: "/contact", label: "Contact" },
   { path: "/reservations", label: "Ma réservation" },
 ];

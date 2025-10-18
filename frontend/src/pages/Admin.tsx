@@ -127,11 +127,19 @@ function Admin() {
   const addNknews = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await apiClient.post("/api/nknews", {
-        title: nkTitle.trim(),
-        content: nkContent.trim(),
-        image: nkImage.trim(),
-      });
+      if (!adminKey) {
+        setErrorMessage("Connectez-vous d'abord avec la clé administrateur.");
+        return;
+      }
+      await apiClient.post(
+        "/api/nknews",
+        {
+          title: nkTitle.trim(),
+          content: nkContent.trim(),
+          image: nkImage.trim(),
+        },
+        { headers: { "x-admin-key": adminKey } }
+      );
       setNkTitle("");
       setNkContent("");
       setNkImage("");
@@ -781,6 +789,5 @@ const updateAvailability = async (
 }
 
 export default Admin;
-
 
 

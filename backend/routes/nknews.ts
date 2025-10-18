@@ -17,6 +17,11 @@ router.get("/", (_req, res) => {
 });
 
 router.post("/", (req, res) => {
+  const configuredKey = process.env.ADMIN_API_KEY;
+  const providedKey = req.header("x-admin-key");
+  if (configuredKey && providedKey !== configuredKey) {
+    return res.status(401).json({ message: "Clé administrateur requise." });
+  }
   try {
     const newArticle = req.body ?? {};
     const entry = {
@@ -45,4 +50,3 @@ router.post("/", (req, res) => {
 });
 
 export default router;
-
