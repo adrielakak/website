@@ -202,13 +202,21 @@ router.patch("/reservations/:id", async (req, res) => {
     const updated = await updateReservationById(id, updates);
     if (updated) {
       try {
-        const reason = sessionId ? "changed" : undefined;
-        const paymentStatus = (updated.status === "stripe_confirmed" || updated.status === "virement_confirme") ? "confirmed" : "pending";
-        await sendReservationConfirmationEmail({
-          reservation: updated as any,
-          paymentStatus,
-          ...(reason ? { reason } : {}),
-        } as any);
+        const statusChangedToCancelled = updates.status === "cancelled" && reservation.status !== "cancelled";
+
+        if (statusChangedToCancelled) {
+          await sendReservationCancellationEmail(updated as any);
+        } else {
+          const reason = sessionId ? "changed" : undefined;
+          const paymentStatus =
+            updated.status === "stripe_confirmed" || updated.status === "virement_confirme" ? "confirmed" : "pending";
+
+          await sendReservationConfirmationEmail({
+            reservation: updated as any,
+            paymentStatus,
+            ...(reason ? { reason } : {}),
+          } as any);
+        }
       } catch (e) {
         console.warn("E-mail de confirmation non envoyé après changement (admin):", e);
       }
