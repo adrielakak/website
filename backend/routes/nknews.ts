@@ -12,7 +12,23 @@ async function readList(): Promise<any[]> {
   const raw = await fs.readFile(filePath, "utf-8");
   try {
     const data = JSON.parse(raw);
-    return Array.isArray(data) ? data : [];
+    const list = Array.isArray(data) ? data : [];
+    // Normalize: ensure every entry has an id and createdAt
+    let changed = false;
+    for (const item of list) {
+      if (!item.id) {
+        item.id = randomUUID();
+        changed = true;
+      }
+      if (!item.createdAt) {
+        item.createdAt = new Date().toISOString();
+        changed = true;
+      }
+    }
+    if (changed) {
+      await writeList(list);
+    }
+    return list;
   } catch {
     return [];
   }
@@ -80,8 +96,22 @@ router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const list = await readList();
-    const next = list.filter((it) => it.id !== id);
-    if (next.length === list.length) return res.status(404).json({ message: "Article introuvable." });
+
+    let next = list;
+    if (id?.startsWith("index:")) {
+      const idx = Number(id.split(":")[1]);
+      if (Number.isInteger(idx) && idx >= 0 && idx < list.length) {
+        next = [...list.slice(0, idx), ...list.slice(idx + 1)];
+      } else {
+        return res.status(404).json({ message: "Index invalide." });
+      }
+    } else {
+      next = list.filter((it) => it.id !== id);
+      if (next.length === list.length) {
+        return res.status(404).json({ message: "Article introuvable." });
+      }
+    }
+
     await writeList(next);
     return res.status(204).send();
   } catch (e) {

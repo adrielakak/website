@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { formations } from "../data/formations.js";
+import { getFormations } from "../services/formationsService.js";
 import { getAvailabilityList } from "../services/availabilityService.js";
 import { readReservations } from "../services/reservationStorage.js";
 const router = Router();
 router.get("/", async (_req, res) => {
     try {
+        const formations = await getFormations();
         const [availability, reservations] = await Promise.all([getAvailabilityList(formations), readReservations()]);
         const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente"]);
         const sessions = availability.map((item) => {

@@ -1,7 +1,6 @@
 import { Router } from "express";
-import { sendReservationConfirmationEmail } from "../services/emailService.js";
 import Stripe from "stripe";
-import { formations } from "../data/formations.js";
+import { getFormations } from "../services/formationsService.js";
 import { getSessionAvailability } from "../services/availabilityService.js";
 import { addReservation, countActiveReservationsBySession } from "../services/reservationStorage.js";
 const router = Router();
@@ -55,6 +54,7 @@ router.post("/create-checkout-session", async (req, res) => {
     if (!stripeSecretKey) {
         return res.status(500).json({ message: "La clé Stripe n'est pas configurée." });
     }
+    const formations = await getFormations();
     const formation = formations.find((item) => item.id === formationId);
     if (!formation) {
         return res.status(404).json({ message: "Formation introuvable." });
@@ -92,8 +92,8 @@ router.post("/create-checkout-session", async (req, res) => {
             customer_email: customerEmail,
             metadata,
             line_items: lineItems,
-            success_url: `${successBase}/formations?paiement=stripe-success&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${successBase}/formations?paiement=stripe-cancel`,
+            success_url: `${successBase}/thank-you`,
+            cancel_url: `${successBase}/`,
             allow_promotion_codes: false,
             billing_address_collection: "auto",
         });
@@ -116,4 +116,3 @@ router.post("/create-checkout-session", async (req, res) => {
     }
 });
 export default router;
-

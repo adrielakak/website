@@ -1,11 +1,14 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import { formations } from "./data/formations.js";
+import { getFormations } from "./services/formationsService.js";
 import adminRouter from "./routes/admin.js";
 import availabilityRouter from "./routes/availability.js";
 import stripeRouter from "./routes/stripe.js";
 import stripeWebhookRouter from "./routes/stripeWebhook.js";
+import nknewsRoutes from "./routes/nknews.js";
+import uploadsRouter from "./routes/uploads.js";
+import { resolveDataPath } from "./services/storagePaths.js";
 import { addContactMessage } from "./services/contactStorage.js";
 import { addReservation, countActiveReservationsBySession, findReservationById, readReservations, updateReservationById, } from "./services/reservationStorage.js";
 import { ensureAvailabilityDefaults, getAvailabilityList, getSessionAvailability, } from "./services/availabilityService.js";
@@ -35,12 +38,16 @@ app.use(cors({
 }));
 app.use("/api/stripe/webhook", stripeWebhookRouter);
 app.use(express.json());
+app.use("/api/uploads", uploadsRouter);
+app.use("/uploads", express.static(resolveDataPath("uploads")));
 app.get("/health", (_req, res) => {
     res.json({ status: "ok" });
 });
-app.get("/api/formations", (_req, res) => {
+app.get("/api/formations", async (_req, res) => {
+    const formations = await getFormations();
     res.json(formations);
 });
+app.use("/api/nknews", nknewsRoutes);
 app.post("/api/reservations", async (req, res) => {
     const { customerName, customerEmail, formationId, sessionId, paymentMethod } = req.body ?? {};
     if (!customerName || !customerEmail || !formationId || !sessionId || !paymentMethod) {
@@ -49,6 +56,7 @@ app.post("/api/reservations", async (req, res) => {
     if (paymentMethod !== "virement") {
         return res.status(400).json({ message: "Ce point d'entrée gère uniquement les virements bancaires." });
     }
+    const formations = await getFormations();
     const formation = formations.find((item) => item.id === formationId);
     if (!formation) {
         return res.status(404).json({ message: "Formation introuvable." });
@@ -128,6 +136,7 @@ app.post("/api/reservations/manage", async (req, res) => {
             reservation.customerEmail.trim().toLowerCase() !== String(customerEmail).trim().toLowerCase()) {
             return res.status(404).json({ message: "Réservation introuvable. Vérifiez les informations saisies." });
         }
+        const formations = await getFormations();
         const [availabilityList, reservations] = await Promise.all([getAvailabilityList(formations), readReservations()]);
         const activeStatuses = new Set(["stripe_pending", "stripe_confirmed", "virement_en_attente"]);
         const sessions = availabilityList
@@ -185,6 +194,7 @@ app.patch("/api/reservations/:reservationId", async (req, res) => {
                 .status(409)
                 .json({ message: "Cette réservation est annulée. Merci de nous contacter pour toute assistance." });
         }
+        const formations = await getFormations();
         const formation = formations.find((form) => form.id === reservation.formationId);
         if (!formation) {
             return res.status(404).json({ message: "Formation associée introuvable." });
@@ -213,6 +223,16 @@ app.patch("/api/reservations/:reservationId", async (req, res) => {
         if (!updated) {
             return res.status(500).json({ message: "Impossible de mettre à jour la réservation." });
         }
+        try {
+            await sendReservationConfirmationEmail({
+                reservation: updated,
+                paymentStatus: updated.status === "stripe_confirmed" ? "confirmed" : "pending",
+                reason: "changed",
+            });
+        }
+        catch (e) {
+            console.warn("E-mail de confirmation non envoyé après changement de session (client):", e);
+        }
         const sanitizedReservation = {
             id: updated.id,
             formationId: updated.formationId,
@@ -238,7 +258,7 @@ app.patch("/api/reservations/:reservationId", async (req, res) => {
 app.use("/api/stripe", stripeRouter);
 app.use("/api/availability", availabilityRouter);
 app.use("/api/admin", adminRouter);
-await ensureAvailabilityDefaults(formations);
+await ensureAvailabilityDefaults(await getFormations());
 app.listen(PORT, () => {
     console.log(`Serveur Ateliers Théâtre de Nantes démarré sur le port ${PORT}`);
 });

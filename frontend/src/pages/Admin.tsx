@@ -231,6 +231,23 @@ function Admin() {
     setEditNewsId(item.id ?? null);
   };
 
+  const deleteNews = async (item: { id?: string }, index: number) => {
+    if (!adminKey) return;
+    const target = item.id ?? `index:${index}`;
+    const ok = window.confirm("Supprimer d�finitivement cette actualit� ?");
+    if (!ok) return;
+    try {
+      await apiClient.delete(`/api/nknews/${encodeURIComponent(target)}`, { headers: { "x-admin-key": adminKey } });
+      const res = await apiClient.get<Array<{ id?: string; title?: string; content?: string; image?: string; createdAt?: string }>>(
+        "/api/nknews"
+      );
+      setNknews(res.data ?? []);
+    } catch (e) {
+      console.error("Erreur suppression NKNEWS:", e);
+      setErrorMessage("Suppression impossible.");
+    }
+  };
+
   const handleNewsDelete = async (id?: string) => {
     if (!id || !adminKey) return;
     const ok = window.confirm("Supprimer définitivement cette actualité ?");
@@ -708,7 +725,7 @@ const updateAvailability = async (
                     <button
                       type="button"
                       className="rounded-full border border-red-500/40 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-red-200 transition hover:bg-red-500/10"
-                      onClick={() => handleNewsDelete(item.id)}
+                      onClick={() => deleteNews(item, i)}
                     >
                       Supprimer
                     </button>

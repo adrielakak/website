@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { formations } from "../data/formations.js";
+import { getFormations, addSession } from "../services/formationsService.js";
 import { getAvailabilityList, getSessionAvailability, upsertSessionAvailability, } from "../services/availabilityService.js";
 import { countActiveReservationsBySession, findReservationById, listReservations, readReservations, updateReservationById, } from "../services/reservationStorage.js";
 import { deleteContactMessage, listContactMessages, updateContactMessageStatus } from "../services/contactStorage.js";
+import { sendReservationConfirmationEmail } from "../services/emailService.js";
 const router = Router();
 function requireAdminKey(req, res, next) {
     const configuredKey = process.env.ADMIN_API_KEY;
@@ -20,6 +21,7 @@ function requireAdminKey(req, res, next) {
 router.use(requireAdminKey);
 router.get("/availability", async (_req, res) => {
     try {
+        const formations = await getFormations();
         const [availability, reservations] = await Promise.all([
             getAvailabilityList(formations),
             readReservations(),
@@ -61,6 +63,7 @@ router.put("/availability/:sessionId", async (req, res) => {
         return res.status(400).json({ message: "isCancelled doit être un booléen." });
     }
     try {
+        const formations = await getFormations();
         const formation = formations.find((form) => form.sessions.some((session) => session.id === sessionId));
         if (!formation) {
             return res.status(404).json({ message: "Session introuvable." });
@@ -86,6 +89,22 @@ router.put("/availability/:sessionId", async (req, res) => {
         res.status(500).json({ message: "Impossible de mettre à jour la disponibilité." });
     }
 });
+// Créer une nouvelle session pour une formation
+router.post("/sessions", async (req, res) => {
+    const { formationId, label, startDate, endDate, id } = req.body ?? {};
+    if (!formationId || !label || !startDate || !endDate) {
+        return res.status(400).json({ message: "formationId, label, startDate et endDate sont requis." });
+    }
+    try {
+        const session = await addSession(formationId, { id, label, startDate, endDate });
+        await upsertSessionAvailability(session.id, {});
+        res.json({ session });
+    }
+    catch (error) {
+        console.error("Erreur admin/sessions:create:", error);
+        res.status(500).json({ message: error.message || "Impossible d'ajouter la session." });
+    }
+});
 router.patch("/reservations/:id", async (req, res) => {
     const { id } = req.params;
     const { sessionId, status } = req.body ?? {};
@@ -99,6 +118,7 @@ router.patch("/reservations/:id", async (req, res) => {
         }
         const updates = {};
         if (sessionId) {
+            const formations = await getFormations();
             const formation = formations.find((form) => form.id === reservation.formationId);
             if (!formation) {
                 return res.status(404).json({ message: "Formation associée introuvable." });
@@ -133,6 +153,18 @@ router.patch("/reservations/:id", async (req, res) => {
             updates.status = status;
         }
         const updated = await updateReservationById(id, updates);
+        if (updated) {
+            try {
+                await sendReservationConfirmationEmail({
+                    reservation: updated,
+                    paymentStatus: updated.status === "stripe_confirmed" ? "confirmed" : "pending",
+                    reason: "changed",
+                });
+            }
+            catch (e) {
+                console.warn("E-mail de confirmation non envoyé après changement (admin):", e);
+            }
+        }
         if (!updated) {
             return res.status(404).json({ message: "Réservation introuvable." });
         }
