@@ -354,7 +354,7 @@ function Formations() {
               </p>
               <h1 className="text-3xl font-semibold sm:text-4xl md:text-5xl">Choisissez votre formation</h1>
               <p className="max-w-2xl text-sm text-white/70 sm:text-base">
-                Toutes nos sessions sont limitees afin de garantir un accompagnement attentif. Choisissez votre mode de paiement : Stripe pour un reglement immediat ou virement bancaire avec IBAN.
+                Toutes nos sessions sont limitées afin de garantir un accompagnement attentif. Choisissez votre mode de paiement : Stripe pour un reglèment immédiat ou virement bancaire avec IBAN.
               </p>
             </div>
           </AnimatedContent>
