@@ -7,6 +7,7 @@ import { resolveDataPath } from "./storagePaths.js";
 type ExtraSessionsState = Record<string, SessionOption[]>; // key: formationId
 
 const EXTRA_SESSIONS_PATH = resolveDataPath("extraSessions.json");
+const REMOVED_SESSIONS_PATH = resolveDataPath("removedSessions.json");
 
 async function readExtraSessions(): Promise<ExtraSessionsState> {
   const exists = await fs.pathExists(EXTRA_SESSIONS_PATH);
@@ -26,11 +27,29 @@ async function writeExtraSessions(state: ExtraSessionsState): Promise<void> {
   await fs.outputJson(EXTRA_SESSIONS_PATH, state, { spaces: 2 });
 }
 
+async function readRemovedSessions(): Promise<Set<string>> {
+  const exists = await fs.pathExists(REMOVED_SESSIONS_PATH);
+  if (!exists) return new Set<string>();
+  const raw = await fs.readFile(REMOVED_SESSIONS_PATH, "utf-8");
+  if (!raw.trim()) return new Set<string>();
+  try {
+    const arr = JSON.parse(raw) as string[];
+    return new Set(arr);
+  } catch {
+    return new Set<string>();
+  }
+}
+
+async function writeRemovedSessions(ids: Set<string>): Promise<void> {
+  await fs.outputJson(REMOVED_SESSIONS_PATH, Array.from(ids), { spaces: 2 });
+}
+
 export async function getFormations(): Promise<Formation[]> {
   const extras = await readExtraSessions();
+  const removed = await readRemovedSessions();
   return baseFormations.map((f) => ({
     ...f,
-    sessions: [...f.sessions, ...(extras[f.id] ?? [])],
+    sessions: [...f.sessions, ...(extras[f.id] ?? [])].filter((s) => !removed.has(s.id)),
   }));
 }
 
@@ -64,3 +83,29 @@ export async function addSession(
   return next;
 }
 
+export async function removeSession(sessionId: string): Promise<boolean> {
+  // Try to remove from extras first
+  const extras = await readExtraSessions();
+  let removed = false;
+  for (const [formationId, list] of Object.entries(extras)) {
+    const idx = list.findIndex((s) => s.id === sessionId);
+    if (idx !== -1) {
+      list.splice(idx, 1);
+      extras[formationId] = list;
+      await writeExtraSessions(extras);
+      removed = true;
+      break;
+    }
+  }
+
+  if (removed) return true;
+
+  // If not in extras, tombstone a base session
+  const removedSet = await readRemovedSessions();
+  if (!removedSet.has(sessionId)) {
+    removedSet.add(sessionId);
+    await writeRemovedSessions(removedSet);
+    return true;
+  }
+  return false;
+}

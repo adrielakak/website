@@ -295,6 +295,28 @@ const updateAvailability = async (
   }
 };
 
+  const deleteSessionById = async (sessionId: string) => {
+    if (!adminKey) {
+      return;
+    }
+    const ok = window.confirm(
+      "Supprimer définitivement cette session ? Elle disparaîtra des pages publiques et de l'admin."
+    );
+    if (!ok) return;
+    try {
+      setSavingSessionId(sessionId);
+      await apiClient.delete(`/api/admin/sessions/${sessionId}`, {
+        headers: { "x-admin-key": adminKey },
+      });
+      await fetchDashboard(adminKey);
+    } catch (error) {
+      console.error("Erreur suppression session:", error);
+      setErrorMessage("Impossible de supprimer la session.");
+    } finally {
+      setSavingSessionId(null);
+    }
+  };
+
   const updateReservation = async (
     reservationId: string,
     updates: { sessionId?: string; status?: AdminReservationStatus }
@@ -556,17 +578,10 @@ const updateAvailability = async (
                               ? "border-emerald-400/40 text-emerald-200 hover:bg-emerald-400/10"
                               : "border-red-400/40 text-red-200 hover:bg-red-400/10"
                           }`}
-                          onClick={() =>
-                            updateAvailability(
-                              session.sessionId,
-                              session.isCancelled
-                                ? { isCancelled: false, isOpen: true }
-                                : { isCancelled: true }
-                            )
-                          }
+                          onClick={() => deleteSessionById(session.sessionId)}
                           disabled={isSaving}
                         >
-                          {session.isCancelled ? "Réactiver la session" : "Annuler la session"}
+                          Supprimer la session
                         </button>
                       </div>
                     </div>
@@ -1018,6 +1033,8 @@ const updateAvailability = async (
 }
 
 export default Admin;
+
+
 
 
 

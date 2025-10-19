@@ -1,7 +1,8 @@
 ﻿import { NextFunction, Request, Response, Router } from "express";
 
-import { getFormations, addSession } from "../services/formationsService.js";
+import { getFormations, addSession, removeSession } from "../services/formationsService.js";
 import {
+  ensureAvailabilityDefaults,
   getAvailabilityList,
   getSessionAvailability,
   SessionAvailability,
@@ -139,6 +140,25 @@ router.post("/sessions", async (req, res) => {
   } catch (error) {
     console.error("Erreur admin/sessions:create:", error);
     res.status(500).json({ message: (error as Error).message || "Impossible d'ajouter la session." });
+  }
+});
+
+// Supprimer définitivement une session (la retirer des extras ou masquer une session de base)
+router.delete("/sessions/:sessionId", async (req, res) => {
+  const { sessionId } = req.params;
+  if (!sessionId) {
+    return res.status(400).json({ message: "sessionId requis." });
+  }
+  try {
+    const changed = await removeSession(sessionId);
+    await ensureAvailabilityDefaults(await getFormations());
+    if (!changed) {
+      return res.status(404).json({ message: "Session introuvable." });
+    }
+    return res.status(204).send();
+  } catch (error) {
+    console.error("Erreur admin/sessions:delete:", error);
+    return res.status(500).json({ message: "Impossible de supprimer la session." });
   }
 });
 
