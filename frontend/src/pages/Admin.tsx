@@ -625,7 +625,7 @@ const updateAvailability = async (
                 value={newSessionLabel}
                 onChange={(e) => setNewSessionLabel(e.target.value)}
                 className="mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
-                placeholder="Session week-end : 12 & 13 décembre 2025"
+                placeholder="Session week-end : 12 & 13 décembre 2026"
                 required
               />
             </div>
