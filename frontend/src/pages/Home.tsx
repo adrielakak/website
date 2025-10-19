@@ -10,14 +10,14 @@ const carouselItems = [
     legend: "Improvisations collectives pour libérer l'écoute et la confiance.",
   },
   {
-    src: "https://images.unsplash.com/photo-1515168833906-d2a3b82b302a?q=80&w=1600&auto=format&fit=crop",
-    alt: "Session de doublage en studio",
-    legend: "Initiation au doublage dans des conditions proches du studio pro.",
+    src: "https://tse1.explicit.bing.net/th/id/OIP.MAssmab7AQN6W7T7vQGsiQHaEL?rs=1&pid=ImgDetMain&o=7&rm=3",
+    alt: "Preacher",
+    legend: "Ruth Negga",
   },
   {
-    src: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=1600&auto=format&fit=crop",
-    alt: "Presentation publique en fin de stage",
-    legend: "Restitution publique du dimanche : oser la scène, partager l'émotion.",
+    src: "https://ds.static.rtbf.be/article/image/1248x702/2/d/2/f7e2b2b75b04175610e5a00c1e221ebb-1402035539.jpg",
+    alt: "Gardiens de la Galaxie",
+    legend: "Marvel Studios",
   },
 ];
 
@@ -197,7 +197,7 @@ function Home() {
             <div>
               <h2 className="section-title text-white">En images</h2>
               <p className="section-subtitle text-white/55">
-                Quelques moments capturés lors des ateliers : travail de scène, initiation doublage, restitution publique.
+                Quelques doublages phares de la carrière de Nathalie Karsenti.
               </p>
             </div>
           </AnimatedContent>
