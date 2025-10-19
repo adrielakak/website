@@ -10,9 +10,9 @@ const carouselItems = [
     legend: "Improvisations collectives pour libérer l'écoute et la confiance.",
   },
   {
-    src: "https://thefutureoftheforce.com/wp-content/uploads/2023/07/Saw-X-Header.jpg",
-    alt: "Saw X",
-    legend: "Ruth Negga",
+    src: "https://th.bing.com/th/id/R.659eb6631bdd6301f141403c9c1a61a0?rik=ZqbYyl9kKFrhvg&riu=http%3a%2f%2fhdqwalls.com%2fwallpapers%2favengers-infinity-war-new-poster-rh.jpg&ehk=P6ky1CgtTABNI5qVyI6JVjXWiHykgC8ao4Thq%2fKgkZg%3d&risl=&pid=ImgRaw&r=0",
+    alt: "Avengers Infinity War",
+    legend: "Avengers Infinity War - Marvel Studios",
   },
   {
     src: "https://ds.static.rtbf.be/article/image/1248x702/2/d/2/f7e2b2b75b04175610e5a00c1e221ebb-1402035539.jpg",
