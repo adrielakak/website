@@ -67,10 +67,10 @@ function Home() {
               <p className="text-xs font-semibold uppercase tracking-[0.5em] text-white/60">
                 Ateliers Theatre de Nantes
               </p>
-              <h2 className="text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl">
+              <h4 className="text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl">
                 Sessions week-end de 12H 
                 stages intensifs (théâtre & doublage) de Nathalie Karsenti
-              </h2>
+              </h4>
               <p className="max-w-2xl text-base text-white/70">
                 Nathalie Karsenti vous accompagne dans le jeu d'acteur, l'improvisation et le doublage. Un cadre exigeant et bienveillant pour explorer votre voix, votre présence et votre créativité.
               </p>
