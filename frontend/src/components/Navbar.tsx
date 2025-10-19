@@ -53,7 +53,7 @@ function Navbar() {
         <div className="hidden items-center gap-6 md:flex">
           <GooeyNav items={gooeyItems} activeIndex={activeIndex} />
           <Link to="/formations" className="btn-primary text-xs uppercase tracking-[0.38em]">
-            Réserver une formation
+            Réservez une formation
           </Link>
         </div>
 
