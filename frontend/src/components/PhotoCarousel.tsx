@@ -47,11 +47,11 @@ function PhotoCarousel({ items, autoPlay = true, interval = DEFAULT_INTERVAL }: 
         {photos.map((item, index) => (
           <figure
             key={item.src}
-            className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+            className={`absolute inset-0 flex h-full w-full items-center justify-center bg-black/80 transition-all duration-700 ease-in-out ${
               index === activeIndex ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
           >
-            <img src={item.src} alt={item.alt} className="h-full w-full object-cover" />
+            <img src={item.src} alt={item.alt} className="h-full w-full object-contain" />
             {item.legend && (
               <figcaption className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-6 py-4 text-sm text-white">
                 {item.legend}
