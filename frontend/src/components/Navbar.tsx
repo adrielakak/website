@@ -42,7 +42,7 @@ function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link to="/" className="flex items-center gap-3 text-lg font-semibold text-white" onClick={closeMenu}>
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-primary to-brand-dark text-white shadow-glow">
-            AT
+            ATD
           </span>
           <div className="leading-tight text-white/80">
             <span className="tracking-wide">Ateliers Théâtre & doublage</span>
