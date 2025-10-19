@@ -65,7 +65,7 @@ function Home() {
           <AnimatedContent distance={80}>
             <div className="flex-1 space-y-6">
               <p className="text-xs font-semibold uppercase tracking-[0.5em] text-white/60">
-                Ateliers Théâtre de Nantes
+                Ateliers Théâtre de Nantes &amp; doublage
               </p>
               <h4 className="text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl">
                 Sessions week-end de 12H 
