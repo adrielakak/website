@@ -263,7 +263,7 @@ function Home() {
                 className="card-lux flex items-center justify-between bg-white/[0.03] px-6 py-6 text-sm font-semibold text-white transition hover:bg-white/[0.06]"
               >
                 Wikipédia
-                <span aria-hidden className="text-lg">â†—</span>
+                <span aria-hidden className="text-lg">↗</span>
               </a>
               <a
                 href="https://share.google/EMmZvm8sN2uEYuvQD"
@@ -272,7 +272,7 @@ function Home() {
                 className="card-lux flex items-center justify-between bg-white/[0.03] px-6 py-6 text-sm font-semibold text-white transition hover:bg-white/[0.06]"
               >
                 AlloCiné
-                <span aria-hidden className="text-lg">â†—</span>
+                <span aria-hidden className="text-lg">↗</span>
               </a>
               <a
                 href="https://youtube.com/@nathaliekarsenti?si=QnzpQssPOGZAfZag"
@@ -280,8 +280,8 @@ function Home() {
                 rel="noreferrer"
                 className="card-lux flex items-center justify-between bg-white/[0.03] px-6 py-6 text-sm font-semibold text-white transition hover:bg-white/[0.06]"
               >
-                ChaÃ®ne YouTube
-                <span aria-hidden className="text-lg">â†—</span>
+                Chaîne YouTube
+                <span aria-hidden className="text-lg">↗</span>
               </a>
             </div>
           </AnimatedContent>
@@ -298,7 +298,7 @@ function Home() {
             <div className="relative z-10 space-y-6">
               <h2 className="text-3xl font-semibold md:text-4xl">Contact rapide</h2>
               <p className="max-w-xl text-sm text-white/70">
-                Une question sur le contenu des stages, un besoin spécifique ou une demande de devis pour un groupe ? Ecrivez-nous ou appelez-nous : nous revenons vers vous sous 48 heures ouvrées.
+                Une question sur le contenu des stages, un besoin spécifique ou une demande de devis pour un groupe ? Ecrivez-nous ou appelez-nous : nous reviendrons vers vous sous 48 heures ouvrées.
               </p>
               <div className="grid gap-6 text-sm md:grid-cols-2">
                 <div>
