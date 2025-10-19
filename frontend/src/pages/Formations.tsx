@@ -56,7 +56,7 @@ function QuickStripeCheckoutForm({
     event.preventDefault();
 
     if (!formation) {
-      onErrorChange("La formation sÃ©lectionnÃ©e est indisponible.");
+      onErrorChange("La formation sélectionnée est indisponible.");
       return;
     }
 
@@ -66,12 +66,12 @@ function QuickStripeCheckoutForm({
     }
 
     if (isSessionCancelled) {
-      onErrorChange("Cette session a Ã©tÃ© annulÃ©e. Merci de sÃ©lectionner une autre date.");
+      onErrorChange("Cette session a été annulée. Merci de sélectionner une autre date.");
       return;
     }
 
     if (!isSessionAvailable) {
-      onErrorChange("Cette session est complÃ¨te ou momentanÃ©ment fermÃ©e aux rÃ©servations.");
+      onErrorChange("Cette session est complète ou momentanément fermée aux réservations.");
       return;
     }
 
@@ -107,12 +107,12 @@ function QuickStripeCheckoutForm({
         onErrorChange(
           axiosError.response?.data?.message ??
             axiosError.message ??
-            "Impossible de dÃ©marrer le paiement Stripe pour le moment."
+            "Impossible de démarrer le paiement Stripe pour le moment."
         );
       } else if (checkoutError instanceof Error) {
         onErrorChange(checkoutError.message);
       } else {
-        onErrorChange("Impossible de dÃ©marrer le paiement Stripe pour le moment.");
+        onErrorChange("Impossible de démarrer le paiement Stripe pour le moment.");
       }
     } finally {
       onLoadingChange(false);
@@ -176,13 +176,13 @@ function QuickStripeCheckoutForm({
                   return "";
                 }
                 if (info.isCancelled) {
-                  return " â€“ session annulÃ©e";
+                  return " – session annulée";
                 }
                 if (!info.isOpen) {
-                  return " â€“ session fermÃ©e";
+                  return " – session fermée";
                 }
                 if (info.remaining <= 0) {
-                  return " â€” complet";
+                  return " — complet";
                 }
                 return "";
               })()}
@@ -196,8 +196,8 @@ function QuickStripeCheckoutForm({
         </button>
         <span className="text-xs text-white/50">
           {isSessionAvailable
-            ? "Vous serez redirigÃ© vers le formulaire sÃ©curisÃ© de Stripe."
-            : "Session indisponible : ajustez votre sÃ©lection ou contactez-nous."}
+            ? "Vous serez redirigé vers le formulaire sécurisé de Stripe."
+            : "Session indisponible : ajustez votre sélection ou contactez-nous."}
         </span>
       </div>
       {errorMessage && (
@@ -207,12 +207,12 @@ function QuickStripeCheckoutForm({
       )}
       {isSessionCancelled && (
         <div className="md:col-span-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-          Cette session a Ã©tÃ© annulÃ©e. Merci de sÃ©lectionner une autre date.
+          Cette session a été annulée. Merci de sélectionner une autre date.
         </div>
       )}
       {!isSessionCancelled && !isSessionAvailable && (
         <div className="md:col-span-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-          Cette session est complÃ¨te ou momentanÃ©ment fermÃ©e aux rÃ©servations. Merci de choisir une autre date ou de
+          Cette session est complète ou momentanément fermée aux réservations. Merci de choisir une autre date ou de
           nous contacter.
         </div>
       )}
@@ -277,8 +277,8 @@ function Formations() {
         setAvailability(map);
         setAvailabilityError(null);
       } catch (err) {
-        console.error("Erreur de rÃ©cupÃ©ration des disponibilitÃ©s:", err);
-        setAvailabilityError("Impossible de rÃ©cupÃ©rer les disponibilitÃ©s en temps rÃ©el.");
+        console.error("Erreur de récupération des disponibilités:", err);
+        setAvailabilityError("Impossible de récupérer les disponibilités en temps réel.");
       } finally {
         setAvailabilityLoading(false);
       }
@@ -368,10 +368,10 @@ function Formations() {
               <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div className="max-w-xl">
                   <h2 className="text-2xl font-semibold text-white sm:text-3xl">
-                    Calendrier des stages ThÃ©Ã¢tre &amp; doublage
+                    Calendrier des stages Théâtre &amp; doublage
                   </h2>
                   <p className="mt-3 text-sm text-white/70 sm:text-base">
-                    Toutes les sessions proposÃ©es par Nathalie Karsenti Ã  Nantes. Places limitÃ©es Ã  16 personnes par week-end. Confirmation dÃ©finitive aprÃ¨s paiement.
+                    Toutes les sessions proposées par Nathalie Karsenti à Nantes. Places limitées à 16 personnes par week-end. Confirmation définitive après paiement.
                   </p>
                 </div>
                 <div className="inline-flex max-w-full items-center justify-center rounded-2xl border border-brand-primary/30 bg-brand-primary/20 px-5 py-3 text-sm font-semibold text-brand-gold shadow-glow sm:text-base">
@@ -396,7 +396,7 @@ function Formations() {
               <div className="mt-10 rounded-2xl border border-brand-primary/20 bg-brand-primary/10 p-5 sm:p-6">
                 <h3 className="text-lg font-semibold text-white sm:text-xl">Paiement rapide par carte (Stripe)</h3>
                 <p className="mt-2 text-sm text-white/70 sm:text-base">
-                  Remplissez ce formulaire pour saisir vos informations et confirmez le paiement sÃ©curisÃ© via Stripe.
+                  Remplissez ce formulaire pour saisir vos informations et confirmez le paiement sécurisé via Stripe.
                 </p>
                 <QuickStripeCheckoutForm
                   formation={stageIntensif}
@@ -413,14 +413,14 @@ function Formations() {
                   onLoadingChange={setQuickLoading}
                 />
                 <p className="mt-4 text-xs text-white/60 sm:text-sm">
-                  Un imprÃ©vu ? Vous pourrez modifier votre rÃ©servation plus tard via{" "}
+                  Un imprévu ? Vous pourrez modifier votre réservation plus tard via{" "}
                   <Link to="/reservations" className="font-semibold text-brand-gold hover:underline">
-                    l&apos;espace dÃ©diÃ©
+                    l&apos;espace dédié
                   </Link>.
                 </p>
                 {availabilityLoading && (
                   <p className="mt-3 text-xs text-white/60 sm:text-sm">
-                    Actualisation des disponibilitÃ©s en coursâ€¦
+                    Actualisation des disponibilités en cours…
                   </p>
                 )}
                 {availabilityError && (
@@ -433,10 +433,10 @@ function Formations() {
                   className="btn-secondary w-full sm:w-auto"
                   onClick={() => openModal(stageIntensif)}
                 >
-                  Autres options de rÃ©servation (virement)
+                  Autres options de réservation (virement)
                 </button>
                 <p className="text-xs text-white/50 sm:text-sm">
-                  Besoin d&apos;un virement ou d&apos;une facture ? Ouvrez la rÃ©servation classique.
+                  Besoin d&apos;un virement ou d&apos;une facture ? Ouvrez la réservation classique.
                 </p>
               </div>
             </div>
@@ -458,7 +458,7 @@ function Formations() {
 
       {isLoading && (
         <p className="mx-auto mt-12 max-w-6xl px-4 text-center text-sm text-white/50 sm:text-base lg:max-w-7xl">
-          Chargement des informationsâ€¦
+          Chargement des informations…
         </p>
       )}
 

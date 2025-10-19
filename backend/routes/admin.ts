@@ -223,7 +223,7 @@ router.patch("/reservations/:id", async (req, res) => {
     }
 
     if (!updated) {
-      return res.status(404).json({ message: "R�servation introuvable." });
+      return res.status(404).json({ message: "Réservation introuvable." });
     }
     res.json({ reservation: updated });
   } catch (error) {

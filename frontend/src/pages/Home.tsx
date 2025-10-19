@@ -7,7 +7,7 @@ const carouselItems = [
   {
     src: "https://fr.web.img3.acsta.net/img/8d/91/8d9128f0fddeaea82158bce554ba197b.jpg",
     alt: "Nathalie Karsenti",
-    legend: "Improvisations collectives pour libÃ©rer l'Ã©coute et la confiance.",
+    legend: "Improvisations collectives pour libérer l'écoute et la confiance.",
   },
   {
     src: "https://th.bing.com/th/id/R.659eb6631bdd6301f141403c9c1a61a0?rik=ZqbYyl9kKFrhvg&riu=http%3a%2f%2fhdqwalls.com%2fwallpapers%2favengers-infinity-war-new-poster-rh.jpg&ehk=P6ky1CgtTABNI5qVyI6JVjXWiHykgC8ao4Thq%2fKgkZg%3d&risl=&pid=ImgRaw&r=0",
@@ -24,31 +24,31 @@ const carouselItems = [
 const experienceHighlights = [
   {
     title: "Voix officielle de Gamora",
-    text: "Gamora dans l'univers Marvel (Gardiens de la Galaxie, Avengers), mais aussi Eva Mendes, January Jones, Marisol Nichols, Shawnee Smith et bien d'autres actrices amÃ©ricaines.",
+    text: "Gamora dans l'univers Marvel (Gardiens de la Galaxie, Avengers), mais aussi Eva Mendes, January Jones, Marisol Nichols, Shawnee Smith et bien d'autres actrices américaines.",
   },
   {
     title: "Professeur au Cours Florent",
-    text: "DiplÃ´mÃ©e du Conservatoire de Nantes et du Cours Florent, Nathalie y enseigne depuis plus de 5 ans et transmet une mÃ©thode basÃ©e sur l'exigence bienveillante.",
+    text: "Diplômée du Conservatoire de Nantes et du Cours Florent, Nathalie y enseigne depuis plus de 5 ans et transmet une méthode basée sur l'exigence bienveillante.",
   },
   {
-    title: "CrÃ©atrice et animatrice de l'Ã©mission Il Ã©tait une voix",
-    text: "Un rendez-vous dÃ©diÃ© au doublage et aux voix franÃ§aises, qui met en lumiÃ¨re le travail des comÃ©diennes et comÃ©diens de l'ombre.",
+    title: "Créatrice et animatrice de l'émission Il était une voix",
+    text: "Un rendez-vous dédié au doublage et aux voix françaises, qui met en lumière le travail des comédiennes et comédiens de l'ombre.",
   },
 ];
 
 const paymentInfo = [
   {
     title: "Paiement par carte bancaire",
-    text: "StratÃ©gie sÃ©curisÃ©e via Stripe Checkout en mode test (Ã  activer avec votre clÃ© Stripe). Le rÃ¨glement valide immÃ©diatement votre inscription.",
+    text: "Stratégie sécurisée via Stripe Checkout en mode test (à activer avec votre clé Stripe). Le règlement valide immédiatement votre inscription.",
   },
   {
     title: "Paiement par virement bancaire",
-    text: "RÃ©ception de l'IBAN dÃ¨s votre rÃ©servation. Merci d'effectuer le virement avant le dÃ©but du stage pour confirmer votre place.",
-    detail: "IBAN utilisÃ© par dÃ©faut : FR76 XXXX XXXX XXXX XXXX XXXX X",
+    text: "Réception de l'IBAN dès votre réservation. Merci d'effectuer le virement avant le début du stage pour confirmer votre place.",
+    detail: "IBAN utilisé par défaut : FR76 XXXX XXXX XXXX XXXX XXXX X",
   },
   {
     title: "Confirmation et facturation",
-    text: "Un e-mail de confirmation est envoyÃ© automatiquement aprÃ¨s le paiement. Les factures peuvent Ãªtre remises Ã  la fin du stage ou envoyÃ©es par e-mail.",
+    text: "Un e-mail de confirmation est envoyé automatiquement après le paiement. Les factures peuvent être remises à la fin du stage ou envoyées par e-mail.",
   },
 ];
 
@@ -65,18 +65,18 @@ function Home() {
           <AnimatedContent distance={80}>
             <div className="flex-1 space-y-6">
               <p className="text-xs font-semibold uppercase tracking-[0.5em] text-white/60">
-                Ateliers Theatre de Nantes
+                Ateliers Théâtre de Nantes
               </p>
               <h4 className="text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl">
                 Sessions week-end de 12H 
-                stages intensifs (thÃ©Ã¢tre & doublage) de Nathalie Karsenti
+                stages intensifs (théâtre & doublage) de Nathalie Karsenti
               </h4>
               <p className="max-w-2xl text-base text-white/70">
-                Nathalie Karsenti vous accompagne dans le jeu d'acteur, l'improvisation et le doublage. Un cadre exigeant et bienveillant pour explorer votre voix, votre prÃ©sence et votre crÃ©ativitÃ©.
+                Nathalie Karsenti vous accompagne dans le jeu d'acteur, l'improvisation et le doublage. Un cadre exigeant et bienveillant pour explorer votre voix, votre présence et votre créativité.
               </p>
               <div className="flex flex-wrap items-center gap-4">
                 <Link to="/formations" className="btn-primary">
-                  RÃ©servez une formation
+                  Réservez une formation
                 </Link>
                 <Link
                   to="/contact"
@@ -94,9 +94,9 @@ function Home() {
           <AnimatedContent distance={120} delay={0.1}>
             <div className="flex-1">
               <div className="card-lux bg-white/[0.04] p-10 text-white">
-                <h2 className="text-2xl font-semibold text-white">Stages intensifs ThÃ©Ã¢tre &amp; doublage</h2>
+                <h2 className="text-2xl font-semibold text-white">Stages intensifs Théâtre &amp; doublage</h2>
                 <p className="mt-4 text-sm text-white/65">
-                  Un week-end de 12 heures pour sortir de votre zone de confort, explorer votre voix et dÃ©couvrir l'art du doublage avec une voix franÃ§aise emblÃ©matique du cinÃ©ma.
+                  Un week-end de 12 heures pour sortir de votre zone de confort, explorer votre voix et découvrir l'art du doublage avec une voix française emblématique du cinéma.
                 </p>
                 <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-6">
                   <p className="text-xs font-semibold uppercase tracking-[0.35em] text-brand-gold/85">
@@ -105,11 +105,11 @@ function Home() {
                   <ul className="mt-4 space-y-3 text-sm text-white/70">
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                      <span>Improvisations guidÃ©es et travail de scÃ¨nes</span>
+                      <span>Improvisations guidées et travail de scènes</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                      <span>Ecriture de dialogues et interprÃ©tation en duo et en groupe</span>
+                      <span>Ecriture de dialogues et interprétation en duo et en groupe</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
@@ -117,16 +117,16 @@ function Home() {
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                      <span>5 heures de dÃ©couverte du doublage en conditions rÃ©elles</span>
+                      <span>5 heures de découverte du doublage en conditions réelles</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                      <span>PrÃ©sentation publique le dimanche Ã  15h30</span>
+                      <span>Présentation publique le dimanche à 15h30</span>
                     </li>
                   </ul>
                 </div>
                 <p className="mt-6 text-sm text-white/60">
-                  Tarif : <span className="font-semibold text-white">285 â‚¬</span> â€¢ Places limitÃ©es â€¢ A partir de 16 ans.
+                  Tarif : <span className="font-semibold text-white">285 €</span> • Places limitées • A partir de 16 ans.
                 </p>
               </div>
             </div>
@@ -140,20 +140,20 @@ function Home() {
             <div>
               <h2 className="section-title">A propos des ateliers</h2>
               <p className="section-subtitle text-white/50">
-                Notre pÃ©dagogie repose sur la confiance et l'exigence. Chaque atelier rÃ©vÃ¨le votre potentiel scÃ©nique, nourrit l'Ã©coute et dÃ©veloppe votre crÃ©ativitÃ©.
+                Notre pédagogie repose sur la confiance et l'exigence. Chaque atelier révèle votre potentiel scénique, nourrit l'écoute et développe votre créativité.
               </p>
               <div className="mt-9 space-y-5 text-white/65">
                 <p>
-                  L'objectif : oser, se surprendre et transformer la scÃ¨ne en terrain de jeu.
+                  L'objectif : oser, se surprendre et transformer la scène en terrain de jeu.
                 </p>
                 <p>
-                  Nathalie Karsenti accompagne toutes celles et ceux qui souhaitent approfondir leur jeu, affirmer leur prÃ©sence scÃ©nique et dÃ©couvrir l'univers du doublage.
+                  Nathalie Karsenti accompagne toutes celles et ceux qui souhaitent approfondir leur jeu, affirmer leur présence scénique et découvrir l'univers du doublage.
                 </p>
                 <p>
-                  Les groupes sont volontairement limitÃ©s pour offrir des retours personnalisÃ©s. Aucun prÃ©requis : les ateliers s'adaptent Ã  votre niveau et vos envies.
+                  Les groupes sont volontairement limités pour offrir des retours personnalisés. Aucun prérequis : les ateliers s'adaptent à votre niveau et vos envies.
                 </p>
                 <p>
-                  Vous dÃ©sirez gagner en confiance, le stage de Nathalie est fait pour vous. Il s'adresse aussi bien aux comÃ©diens, qu'aux chefs d'entreprises, qu'aux professeurs. A toutes celles et ceux qui doivent performer en public.
+                  Vous désirez gagner en confiance, le stage de Nathalie est fait pour vous. Il s'adresse aussi bien aux comédiens, qu'aux chefs d'entreprises, qu'aux professeurs. A toutes celles et ceux qui doivent performer en public.
                 </p>
               </div>
             </div>
@@ -164,13 +164,13 @@ function Home() {
               <div className="card-lux bg-white/[0.04] p-8">
                 <h3 className="text-xl font-semibold text-white">Un accompagnement sur mesure</h3>
                 <p className="mt-3 text-sm text-white/60">
-                  Groupes limitÃ©s, retours individualisÃ©s, travail corporel, vocal et scÃ©nique : chaque parcours est pensÃ© pour faire grandir votre confiance.
+                  Groupes limités, retours individualisés, travail corporel, vocal et scénique : chaque parcours est pensé pour faire grandir votre confiance.
                 </p>
                 <ul className="mt-5 space-y-3 text-sm text-white/65">
-                  <li>â€¢ Maximum 16 participantÂ·es par session</li>
-                  <li>â€¢ Exercices adaptÃ©s Ã  votre progression</li>
-                  <li>â€¢ Initiation professionnelle au doublage</li>
-                  <li>â€¢ Coaching individuel et collectif</li>
+                  <li>• Maximum 16 participant·es par session</li>
+                  <li>• Exercices adaptés à votre progression</li>
+                  <li>• Initiation professionnelle au doublage</li>
+                  <li>• Coaching individuel et collectif</li>
                 </ul>
               </div>
             </AnimatedContent>
@@ -178,12 +178,12 @@ function Home() {
               <div className="card-lux bg-white/[0.04] p-8">
                 <h3 className="text-xl font-semibold text-white">Informations pratiques</h3>
                 <ul className="mt-4 space-y-3 text-sm text-white/65">
-                  <li>â€¢ 8 rue Mercoeur, 44000 Nantes</li>
-                  <li>â€¢ Samedi 13h30-19h30 / Dimanche 10h00-13h00 puis 14h00-17h00</li>
-                  <li>â€¢ A partir de 16 ans â€“ aucun niveau requis</li>
-                  <li>â€¢ RÃ©servation : nk26fr@gmail.com</li>
-                  <li>â€¢ TÃ©lÃ©phone : 06 09 42 59 11</li>
-                  <li>â€¢ Paiement : Stripe (carte bancaire) ou virement</li>
+                  <li>• 8 rue Mercoeur, 44000 Nantes</li>
+                  <li>• Samedi 13h30-19h30 / Dimanche 10h00-13h00 puis 14h00-17h00</li>
+                  <li>• A partir de 16 ans – aucun niveau requis</li>
+                  <li>• Réservation : nk26fr@gmail.com</li>
+                  <li>• Téléphone : 06 09 42 59 11</li>
+                  <li>• Paiement : Stripe (carte bancaire) ou virement</li>
                 </ul>
               </div>
             </AnimatedContent>
@@ -197,7 +197,7 @@ function Home() {
             <div>
               <h2 className="section-title text-white">En images</h2>
               <p className="section-subtitle text-white/55">
-                Gamora le rÃ´le phare de Nathalie Karsenti, et bien d'autres encore...
+                Gamora le rôle phare de Nathalie Karsenti, et bien d'autres encore...
               </p>
             </div>
           </AnimatedContent>
@@ -224,9 +224,9 @@ function Home() {
         <div className="mx-auto max-w-6xl px-4 py-24 space-y-12 sm:px-6 lg:max-w-7xl">
           <AnimatedContent distance={70}>
             <div>
-              <h2 className="section-title text-white">Paiement et rÃ©servation</h2>
+              <h2 className="section-title text-white">Paiement et réservation</h2>
               <p className="section-subtitle text-white/55">
-                Choisissez votre mode de paiement au moment de la rÃ©servation. Nous proposons Stripe Checkout pour les cartes bancaires et un virement bancaire pour les paiements diffÃ©rÃ©s.
+                Choisissez votre mode de paiement au moment de la réservation. Nous proposons Stripe Checkout pour les cartes bancaires et un virement bancaire pour les paiements différés.
               </p>
             </div>
           </AnimatedContent>
@@ -250,7 +250,7 @@ function Home() {
             <div>
               <h2 className="section-title text-white">Nathalie Karsenti en quelques liens</h2>
               <p className="section-subtitle text-white/55">
-                DÃ©couvrez son parcours, ses rÃ´les emblÃ©matiques et ses projets.
+                Découvrez son parcours, ses rôles emblématiques et ses projets.
               </p>
             </div>
           </AnimatedContent>
@@ -262,7 +262,7 @@ function Home() {
                 rel="noreferrer"
                 className="card-lux flex items-center justify-between bg-white/[0.03] px-6 py-6 text-sm font-semibold text-white transition hover:bg-white/[0.06]"
               >
-                WikipÃ©dia
+                Wikipédia
                 <span aria-hidden className="text-lg">â†—</span>
               </a>
               <a
@@ -271,7 +271,7 @@ function Home() {
                 rel="noreferrer"
                 className="card-lux flex items-center justify-between bg-white/[0.03] px-6 py-6 text-sm font-semibold text-white transition hover:bg-white/[0.06]"
               >
-                AlloCinÃ©
+                AlloCiné
                 <span aria-hidden className="text-lg">â†—</span>
               </a>
               <a
@@ -298,7 +298,7 @@ function Home() {
             <div className="relative z-10 space-y-6">
               <h2 className="text-3xl font-semibold md:text-4xl">Contact rapide</h2>
               <p className="max-w-xl text-sm text-white/70">
-                Une question sur le contenu des stages, un besoin spÃ©cifique ou une demande de devis pour un groupe ? Ecrivez-nous ou appelez-nous : nous revenons vers vous sous 48 heures ouvrÃ©es.
+                Une question sur le contenu des stages, un besoin spécifique ou une demande de devis pour un groupe ? Ecrivez-nous ou appelez-nous : nous revenons vers vous sous 48 heures ouvrées.
               </p>
               <div className="grid gap-6 text-sm md:grid-cols-2">
                 <div>
@@ -308,7 +308,7 @@ function Home() {
                   </a>
                 </div>
                 <div>
-                  <p className="text-white/60">TÃ©lÃ©phone</p>
+                  <p className="text-white/60">Téléphone</p>
                   <a href="tel:+33609425911" className="text-lg font-semibold text-white hover:underline">
                     06 09 42 59 11
                   </a>
