@@ -237,7 +237,7 @@ function Admin() {
   const deleteNews = async (item: { id?: string }, index: number) => {
     if (!adminKey) return;
     const target = item.id ?? `index:${index}`;
-    const ok = window.confirm("Supprimer d�finitivement cette actualit� ?");
+    const ok = window.confirm("Supprimer définitivement cette actualitée ?");
     if (!ok) return;
     try {
       await apiClient.delete(`/api/nknews/${encodeURIComponent(target)}`, { headers: { "x-admin-key": adminKey } });
@@ -253,7 +253,7 @@ function Admin() {
 
   const handleNewsDelete = async (id?: string) => {
     if (!id || !adminKey) return;
-    const ok = window.confirm("Supprimer définitivement cette actualité ?");
+    const ok = window.confirm("Supprimer définitivement cette actualitée ?");
     if (!ok) return;
     try {
       await apiClient.delete(`/api/nknews/${id}`, { headers: { "x-admin-key": adminKey } });
@@ -566,7 +566,7 @@ const updateAvailability = async (
                           }
                           disabled={isSaving}
                         >
-                          {session.isCancelled ? "Réactiver la session" : "Annuléer la session"}
+                          {session.isCancelled ? "Réactiver la session" : "Annuler la session"}
                         </button>
                       </div>
                     </div>
