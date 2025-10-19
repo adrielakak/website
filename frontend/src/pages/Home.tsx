@@ -169,7 +169,7 @@ function Home() {
                 <ul className="mt-5 space-y-3 text-sm text-white/65">
                   <li>â€¢ Maximum 16 participantÂ·es par session</li>
                   <li>â€¢ Exercices adaptÃ©s Ã  votre progression</li>
-                  <li>â€¢ Approche professionnelle du doublage</li>
+                  <li>â€¢ Initiation professionnelle au doublage</li>
                   <li>â€¢ Coaching individuel et collectif</li>
                 </ul>
               </div>
@@ -323,4 +323,5 @@ function Home() {
 }
 
 export default Home;
+
 

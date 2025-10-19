@@ -20,7 +20,7 @@ export interface Formation {
 export const formations: Formation[] = [
   {
     id: "stage-theatre-doublage",
-    title: "Stage intensif Théâtre & doublage",
+    title: "Stage intensif Théâtre & Initiation doublage",
     description:
       "Un week-end de 12 heures pour explorer le jeu d'acteur, travailler la voix et découvrir les coulisses du doublage avec Nathalie Karsenti.",
     duration: "12 h (week-end)",
@@ -31,7 +31,7 @@ export const formations: Formation[] = [
       "Improvisations guidées et travail de l'écoute",
       "Jeu de scène et écriture de séquences originales",
       "Travail du corps et de la voix",
-      "Respiration ventrale approfondie",
+      "Initiation à la respiration ventrale",
       "Découverte du doublage (4 h) en conditions réelles",
       "Présentation publique des scènes le dimanche",
     ],
@@ -87,6 +87,8 @@ export const formations: Formation[] = [
     ],
   },
 ];
+
+
 
 
 
