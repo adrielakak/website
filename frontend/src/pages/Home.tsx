@@ -10,8 +10,8 @@ const carouselItems = [
     legend: "Improvisations collectives pour libérer l'écoute et la confiance.",
   },
   {
-    src: "https://tse1.explicit.bing.net/th/id/OIP.MAssmab7AQN6W7T7vQGsiQHaEL?rs=1&pid=ImgDetMain&o=7&rm=3",
-    alt: "Preacher",
+    src: "https://thefutureoftheforce.com/wp-content/uploads/2023/07/Saw-X-Header.jpg",
+    alt: "Saw X",
     legend: "Ruth Negga",
   },
   {
