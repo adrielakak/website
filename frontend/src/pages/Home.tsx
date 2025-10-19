@@ -197,7 +197,7 @@ function Home() {
             <div>
               <h2 className="section-title text-white">En images</h2>
               <p className="section-subtitle text-white/55">
-                Quelques doublages phares de la carrière de Nathalie Karsenti.
+                Gamora le rôle phare de Nathalie Karsenti, et bien d'autres encore...
               </p>
             </div>
           </AnimatedContent>

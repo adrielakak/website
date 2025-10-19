@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 
 interface PhotoItem {
   src: string;
@@ -72,8 +72,8 @@ function PhotoCarousel({ items, autoPlay = true, interval = DEFAULT_INTERVAL }: 
           <button
             type="button"
             onClick={goPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/60"
-            aria-label="Photo précédente"
+            className="absolute left-4 top-1/2 z-30 -translate-y-1/2 rounded-full border border-white/20 bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/60"
+            aria-label="Photo prÃ©cÃ©dente"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -82,7 +82,7 @@ function PhotoCarousel({ items, autoPlay = true, interval = DEFAULT_INTERVAL }: 
           <button
             type="button"
             onClick={goNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/60"
+            className="absolute right-4 top-1/2 z-30 -translate-y-1/2 rounded-full border border-white/20 bg-black/30 p-3 text-white backdrop-blur transition hover:bg-black/60"
             aria-label="Photo suivante"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -102,7 +102,7 @@ function PhotoCarousel({ items, autoPlay = true, interval = DEFAULT_INTERVAL }: 
               className={`h-2.5 w-8 rounded-full transition ${
                 index === activeIndex ? "bg-brand-primary" : "bg-white/30 hover:bg-white/60"
               }`}
-              aria-label={`Aller à la photo ${index + 1}`}
+              aria-label={`Aller Ã  la photo ${index + 1}`}
             />
           ))}
         </div>
