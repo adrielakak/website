@@ -51,6 +51,7 @@ function QuickStripeCheckoutForm({
   const isSessionOpen = sessionAvailability ? sessionAvailability.isOpen : true;
   const hasSeats = sessionAvailability ? sessionAvailability.remaining > 0 : true;
   const isSessionAvailable = !isSessionCancelled && isSessionOpen && hasSeats;
+  const visibleSessions = formation.sessions.filter((s) => !availability[s.id]?.isCancelled);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -163,20 +164,16 @@ function QuickStripeCheckoutForm({
           <option value="" disabled>
             Selectionner
           </option>
-          {formation.sessions.map((session) => (
+          {visibleSessions.map((session) => (
             <option
               key={session.id}
               value={session.id}
-              disabled={Boolean(availability[session.id]?.isCancelled)}
             >
               {session.label}
               {(() => {
                 const info = availability[session.id];
                 if (!info) {
                   return "";
-                }
-                if (info.isCancelled) {
-                  return " – session annulée";
                 }
                 if (!info.isOpen) {
                   return " – session fermée";
@@ -477,6 +474,8 @@ function Formations() {
 }
 
 export default Formations;
+
+
 
 
 
