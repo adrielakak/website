@@ -39,7 +39,7 @@ const experienceHighlights = [
 const paymentInfo = [
   {
     title: "Paiement par carte bancaire",
-    text: "Stratégie sécurisée via Stripe Checkout en mode test (à activer avec votre clé Stripe). Le règlement valide immédiatement votre inscription.",
+    text: "Stratégie sécurisée via Stripe Checkout. Le règlement valide immédiatement votre inscription.",
   },
   {
     title: "Paiement par virement bancaire",
