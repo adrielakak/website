@@ -167,7 +167,7 @@ function Home() {
                   Groupes limités, retours individualisés, travail corporel, vocal et scénique : chaque parcours est pensé pour faire grandir votre confiance.
                 </p>
                 <ul className="mt-5 space-y-3 text-sm text-white/65">
-                  <li>• Maximum 16 participant·es par session</li>
+                  <li>• Maximum 12 participant·es par session</li>
                   <li>• Exercices adaptés à votre progression</li>
                   <li>• Initiation professionnelle au doublage</li>
                   <li>• Coaching individuel et collectif</li>

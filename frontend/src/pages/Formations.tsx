@@ -368,7 +368,7 @@ function Formations() {
                     Calendrier des stages Théâtre &amp; doublage
                   </h2>
                   <p className="mt-3 text-sm text-white/70 sm:text-base">
-                    Toutes les sessions proposées par Nathalie Karsenti à Nantes. Places limitées à 16 personnes par week-end. Confirmation définitive après paiement.
+                    Toutes les sessions proposées par Nathalie Karsenti à Nantes. Places limitées à 12 personnes par week-end. Confirmation définitive après paiement.
                   </p>
                 </div>
                 <div className="inline-flex max-w-full items-center justify-center rounded-2xl border border-brand-primary/30 bg-brand-primary/20 px-5 py-3 text-sm font-semibold text-brand-gold shadow-glow sm:text-base">
