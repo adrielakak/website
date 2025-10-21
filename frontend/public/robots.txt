@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ateliers-theatre-nantes.onrender.com/sitemap.xml
+Sitemap: https://ateliers-theatre-nantes.onrender.com/sitemap.txt
