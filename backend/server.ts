@@ -31,7 +31,8 @@ dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 4000);
-const DEFAULT_IBAN = process.env.BANK_IBAN ?? "FR76 XXXX XXXX XXXX XXXX XXXX X";
+// IBAN affiché directement (pas via .env)
+const STATIC_IBAN = "FR20 2004 1010 1105 2855 3Y03 211";
 
 const rawOrigins = process.env.CLIENT_URLS ?? process.env.CLIENT_URL ?? "*";
 const allowedOrigins = rawOrigins
@@ -136,7 +137,7 @@ app.post("/api/reservations", async (req, res) => {
     return res.json({
       message:
         "Votre réservation est bien enregistrée. Merci d'effectuer le virement avant le début du stage pour confirmer votre place.",
-      iban: DEFAULT_IBAN,
+      iban: STATIC_IBAN,
       reservationId: reservation.id,
     });
   } catch (error) {

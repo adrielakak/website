@@ -1,5 +1,8 @@
 ﻿import nodemailer from "nodemailer";
 
+// IBAN affiché directement (pas via .env)
+const STATIC_IBAN = "FR20 2004 1010 1105 2855 3Y03 211";
+
 // Types alignés avec le stockage de réservation
 interface ReservationRecord {
   id: string;
@@ -109,6 +112,16 @@ export async function sendReservationConfirmationEmail({
           : ""
       }
 
+      ${
+        paymentStatus === "pending" && reservation.paymentMethod === "virement"
+          ? `<div style="margin:16px 0 8px">
+               <h3 style="margin:0 0 8px">Informations de virement</h3>
+               <p><strong>IBAN :</strong> ${STATIC_IBAN}</p>
+               <p style="margin-top:8px;font-size:12px;color:#666">Merci d'envoyer le justificatif à <a href="mailto:nk26fr@gmail.com">nk26fr@gmail.com</a>.</p>
+             </div>`
+          : ""
+      }
+
       <p>À très bientôt !</p>
       <p style="margin-top: 20px;">— <strong>Les Ateliers Théâtre de Nantes</strong></p>
     </div>
@@ -126,6 +139,12 @@ ID de réservation : ${reservation.id}
 Mode de paiement : ${reservation.paymentMethod === "stripe" ? "Carte bancaire (Stripe)" : "Virement bancaire"}
 
 ${checkoutSessionUrl ? `Reçu Stripe : ${checkoutSessionUrl}` : ""}
+
+${
+  paymentStatus === "pending" && reservation.paymentMethod === "virement"
+    ? `\nInformations de virement\nIBAN : ${STATIC_IBAN}\nMerci d'envoyer le justificatif à nk26fr@gmail.com\n`
+    : ""
+}
 
 À très bientôt !
 — Les Ateliers Théâtre de Nantes

@@ -148,7 +148,7 @@ function ReservationModal({ isOpen, formation, availability, onClose }: Reservat
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-brand-midnight/90 px-4 py-10 backdrop-blur">
+    <div className="reservation-modal fixed inset-0 z-[60] flex items-center justify-center bg-brand-midnight/90 px-4 py-10 backdrop-blur">
       <div className="relative w-full max-w-lg overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.04] p-8 shadow-glow-soft">
         <button
           type="button"
@@ -207,13 +207,14 @@ function ReservationModal({ isOpen, formation, availability, onClose }: Reservat
               required
               value={formValues.sessionId}
               onChange={handleChange("sessionId")}
-              className="mt-2 w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
+              className="mt-2 w-full rounded-2xl border border-white/10 bg-brand-midnight/80 px-4 py-3 text-sm text-white focus:border-brand-primary/60 focus:outline-none focus:ring-2 focus:ring-brand-primary/40"
             >
-              <option value="">Sélectionnez une session</option>
+              <option className="bg-brand-midnight text-white" value="">Sélectionnez une session</option>
               {formation.sessions.map((session) => (
                 <option
                   key={session.id}
                   value={session.id}
+                  className="bg-brand-midnight text-white"
                   disabled={Boolean(availability?.[session.id]?.isCancelled)}
                 >
                   {session.label}

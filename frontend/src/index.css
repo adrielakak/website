@@ -19,6 +19,16 @@ body {
   color: #f8fafc;
 }
 
+/* Réglages pour menu déroulant en mode sombre (réservation) */
+.reservation-modal select,
+.reservation-modal option {
+  background-color: #080b16; /* brand.midnight */
+  color: #f8fafc;            /* near-white */
+}
+.reservation-modal select:focus {
+  outline: none;
+}
+
 .btn-primary {
   @apply inline-flex items-center justify-center rounded-full bg-gradient-to-r from-brand-primary via-brand-dark to-brand-primary px-7 py-3 text-base font-semibold text-white shadow-glow transition duration-300 hover:shadow-glow-soft focus:outline-none focus:ring-2 focus:ring-brand-primary/60 focus:ring-offset-2 focus:ring-offset-brand-midnight;
 }
