@@ -47,9 +47,15 @@ async function writeRemovedSessions(ids: Set<string>): Promise<void> {
 export async function getFormations(): Promise<Formation[]> {
   const extras = await readExtraSessions();
   const removed = await readRemovedSessions();
+  const toTimestamp = (value: string): number => {
+    const parsed = Date.parse(value);
+    return Number.isNaN(parsed) ? Number.MAX_SAFE_INTEGER : parsed;
+  };
   return baseFormations.map((f) => ({
     ...f,
-    sessions: [...f.sessions, ...(extras[f.id] ?? [])].filter((s) => !removed.has(s.id)),
+    sessions: [...f.sessions, ...(extras[f.id] ?? [])]
+      .filter((s) => !removed.has(s.id))
+      .sort((a, b) => toTimestamp(a.startDate) - toTimestamp(b.startDate)),
   }));
 }
 
