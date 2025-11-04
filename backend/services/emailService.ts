@@ -1,7 +1,7 @@
 ﻿import nodemailer from "nodemailer";
 
 // IBAN affiché directement (pas via .env)
-const STATIC_IBAN = "FR20 2004 1010 1105 2855 3Y03 211";
+const STATIC_IBAN = "FR7616958000017349556295534";
 
 // Types alignés avec le stockage de réservation
 interface ReservationRecord {

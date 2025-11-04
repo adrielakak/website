@@ -32,7 +32,7 @@ dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT ?? 4000);
 // IBAN affiché directement (pas via .env)
-const STATIC_IBAN = "FR20 2004 1010 1105 2855 3Y03 211";
+const STATIC_IBAN = "FR7616958000017349556295534";
 
 const rawOrigins = process.env.CLIENT_URLS ?? process.env.CLIENT_URL ?? "*";
 const allowedOrigins = rawOrigins
