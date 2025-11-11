@@ -14,11 +14,13 @@ import { addContactMessage } from "./services/contactStorage.js";
 import {
   addReservation,
   countActiveReservationsBySession,
+  findActiveReservationByEmail,
   findReservationById,
   readReservations,
   ReservationRecord,
   updateReservationById,
-  deleteReservationById,} from "./services/reservationStorage.js";
+  deleteReservationById,
+} from "./services/reservationStorage.js";
 import {
   ensureAvailabilityDefaults,
   getAvailabilityList,
@@ -83,6 +85,13 @@ app.post("/api/reservations", async (req, res) => {
 
   if (paymentMethod !== "virement") {
     return res.status(400).json({ message: "Ce point d'entrée gère uniquement les virements bancaires." });
+  }
+
+  const existingReservation = await findActiveReservationByEmail(customerEmail);
+  if (existingReservation) {
+    return res.status(409).json({
+      message: "Une réservation est déjà enregistrée avec cet e-mail. Merci de nous contacter pour toute modification.",
+    });
   }
 
   const formations = await getFormations();

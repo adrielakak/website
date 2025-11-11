@@ -122,6 +122,25 @@ export async function countActiveReservationsBySession(
   ).length;
 }
 
+export async function findActiveReservationByEmail(email: string): Promise<ReservationRecord | null> {
+  if (!email) {
+    return null;
+  }
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) {
+    return null;
+  }
+
+  const reservations = await readReservations();
+  return (
+    reservations.find(
+      (reservation) =>
+        ACTIVE_STATUSES.includes(reservation.status) &&
+        reservation.customerEmail.trim().toLowerCase() === normalized
+    ) ?? null
+  );
+}
+
 export async function findReservationById(id: string): Promise<ReservationRecord | null> {
   if (!id) {
     return null;
