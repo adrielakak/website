@@ -116,6 +116,7 @@ export async function sendReservationConfirmationEmail({
         paymentStatus === "pending" && reservation.paymentMethod === "virement"
           ? `<div style="margin:16px 0 8px">
                <h3 style="margin:0 0 8px">Informations de virement</h3>
+               <p>Titulaire du compte : NK26</p>
                <p><strong>IBAN :</strong> ${STATIC_IBAN}</p>
                <p style="margin-top:8px;font-size:12px;color:#666">Merci d'envoyer le justificatif à <a href="mailto:nk26fr@gmail.com">nk26fr@gmail.com</a>.</p>
              </div>`
