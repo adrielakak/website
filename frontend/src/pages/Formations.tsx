@@ -395,6 +395,9 @@ function Formations() {
                 <p className="mt-2 text-sm text-white/70 sm:text-base">
                   Remplissez ce formulaire pour saisir vos informations et confirmez le paiement sécurisé via Stripe.
                 </p>
+                <p className="mt-2 text-xs text-white/60 sm:text-sm">
+                  Le paiement en 3 fois sans frais est disponible en passant par Stripe et en choisissant l'option Klarna lors du règlement.
+                </p>
                 <QuickStripeCheckoutForm
                   formation={stageIntensif}
                   name={quickName}
