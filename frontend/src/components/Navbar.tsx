@@ -50,7 +50,7 @@ function Navbar() {
           </div>
         </Link>
 
-        <div className="hidden items-center gap-6 lg:flex">
+        <div className="hidden items-center gap-6 xl:flex">
           <GooeyNav items={gooeyItems} activeIndex={activeIndex} />
           <Link to="/formations" className="btn-primary text-xs uppercase tracking-[0.38em]">
             Réservez une formation
@@ -59,7 +59,7 @@ function Navbar() {
 
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-full border border-white/10 p-2 text-white transition hover:border-brand-primary hover:bg-brand-primary/20 lg:hidden"
+          className="inline-flex items-center justify-center rounded-full border border-white/10 p-2 text-white transition hover:border-brand-primary hover:bg-brand-primary/20 xl:hidden"
           onClick={toggleMenu}
           aria-label="Ouvrir le menu"
         >
@@ -74,7 +74,7 @@ function Navbar() {
       </div>
 
       {isOpen && (
-        <div className="border-t border-white/10 bg-brand-midnight/95 shadow-glow lg:hidden">
+        <div className="border-t border-white/10 bg-brand-midnight/95 shadow-glow xl:hidden">
           <nav className="flex flex-col px-6 py-4 text-white/80">
             {navLinks.map((link) => (
               <button
