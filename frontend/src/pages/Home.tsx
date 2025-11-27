@@ -105,11 +105,15 @@ function Home() {
                   <ul className="mt-4 space-y-3 text-sm text-white/70">
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                      <span>Improvisations guidées et travail de scènes</span>
+                      <span>Échauffement corporel et vocal</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                      <span>Ecriture de dialogues et interprétation en duo et en groupe</span>
+                      <span>Exercices d'improvisations et travail de scènes de cinéma</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
+                      <span>Création en groupe d'un sketch filmé sur un thème donné</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
@@ -117,15 +121,15 @@ function Home() {
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                      <span>5 heures de découverte du doublage en conditions réelles</span>
+                      <span>Initiation au doublage en conditions réelles de studio</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-brand-gold" />
-                      <span>Présentation publique le dimanche à 15h30</span>
+                      <span>Restitution publique du travail le dimanche à 16h</span>
                     </li>
                   </ul>
                 </div>
-                <p className="mt-6 text-sm text-white/60">
+                <p className="mt-6 text-sm text-white/60 leading-relaxed">
                   Tarif : <span className="font-semibold text-white">285 €</span> • Places limitées • A partir de 16 ans.
                 </p>
               </div>
@@ -153,7 +157,11 @@ function Home() {
                   Les groupes sont volontairement limités pour offrir des retours personnalisés. Aucun prérequis : les ateliers s'adaptent à votre niveau et vos envies.
                 </p>
                 <p>
-                  Vous désirez gagner en confiance, le stage de Nathalie est fait pour vous. Il s'adresse aussi bien aux comédiens, qu'aux chefs d'entreprises, qu'aux professeurs. A toutes celles et ceux qui doivent performer en public.
+                  Vous désirez gagner en confiance, le stage de Nathalie est fait pour vous. Il s'adresse aussi bien aux comédiens, qu'aux chefs d'entreprises ou aux professeurs. À toutes celles et ceux qui doivent performer en public.
+                </p>
+                <p>
+                  Des sessions spéciales pour les plus jeunes (CM2, collège) peuvent être organisées. Tenez-vous informés via la page
+                  {" "}<Link to="/formations" className="font-semibold text-brand-gold hover:underline">Formations</Link>.
                 </p>
               </div>
             </div>
@@ -181,7 +189,6 @@ function Home() {
                   <li>• 8 rue Mercoeur / 32 rue scribe, 44000 Nantes (L'adresse vous sera communiquée une semaine avant le stage.)</li>
                   <li>• Samedi 13h30-19h30 / Dimanche 10h00-13h00 puis 14h00-17h00</li>
                   <li>• A partir de 16 ans – aucun niveau requis</li>
-                  <li>• Réservation : nk26fr@gmail.com</li>
                   <li>• Téléphone : 06 09 42 59 11</li>
                   <li>• Paiement : Stripe (carte bancaire) ou virement</li>
                 </ul>
@@ -323,5 +330,3 @@ function Home() {
 }
 
 export default Home;
-
-
