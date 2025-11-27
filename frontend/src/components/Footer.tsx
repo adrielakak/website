@@ -6,7 +6,7 @@ function Footer() {
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12 text-sm text-white/60 md:flex-row md:items-center md:justify-between">
         <div className="space-y-2">
           <p className="text-base font-semibold text-white">Ateliers Théâtre de Nantes</p>
-          <p>8 rue Mercoeur, 44000 Nantes</p>
+          <p>8 rue Mercoeur / 32 rue Scribe, 44000 Nantes</p>
         </div>
         <div className="space-y-2">
           <p className="text-white/50">Contact</p>
