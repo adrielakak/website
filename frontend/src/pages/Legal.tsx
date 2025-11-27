@@ -1,4 +1,4 @@
-﻿export default function Legal() {
+﻿﻿export default function Legal() {
   return (
     <div className="bg-brand-midnight text-white">
       <section className="mx-auto max-w-3xl px-6 py-16">
@@ -31,9 +31,12 @@
             <strong>Responsabilité :</strong> NK26 s'efforce d'assurer l'exactitude des informations. Les liens externes relèvent de la seule responsabilité de leurs éditeurs.
           </p>
           <p>
+            <strong>Annulation et remboursement :</strong> Conformément à l'article L221-28, 12° du Code de la consommation, le droit de rétractation de 14 jours ne s'applique pas aux prestations de services d'activités de loisirs qui doivent être fournis à une date ou à une période déterminée. En conséquence, toute inscription à un stage est ferme et définitive. Toutefois, un changement de date de session est possible une fois, en utilisant l'espace "Gérer ma réservation". Pour toute demande d'annulation exceptionnelle, merci de nous contacter directement.
+          </p>
+          <p>
             <strong>Litiges :</strong> en cas de désaccord, une solution amiable est recherchée. À défaut, les juridictions françaises sont compétentes.
           </p>
-          <p className="text-white/40">Dernière mise à jour : 04/11/2025</p>
+          <p className="text-white/40">Dernière mise à jour : 27/11/2025</p>
         </div>
       </section>
     </div>
