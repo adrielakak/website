@@ -6,7 +6,7 @@
 
         <div className="mt-6 space-y-2 text-white/80">
           <p><strong>Éditeur du site :</strong> NK26 — SASU </p>
-          <p><strong>Siège social :</strong>Rue Briord, 44000 Nantes, France</p>
+          <p><strong>Siège social :</strong> Rue Briord, 44000 Nantes, France</p>
           <p><strong>Responsable de publication :</strong> Nathalie Karsenti</p>
           <p><strong>Contact :</strong> nk26fr@gmail.com — 06 09 42 59 11</p>
           <p><strong>Hébergeur :</strong> Render.com — https://render.com</p>
