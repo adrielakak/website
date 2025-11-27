@@ -178,8 +178,7 @@ function Home() {
               <div className="card-lux bg-white/[0.04] p-8">
                 <h3 className="text-xl font-semibold text-white">Informations pratiques</h3>
                 <ul className="mt-4 space-y-3 text-sm text-white/65">
-                  <li>• 8 rue Mercoeur / 32 rue scribe, 44000 Nantes</li>
-                  <p>L'adresse vous sera communiquée une semaine avant le stage.</p>
+                  <li>• 8 rue Mercoeur / 32 rue scribe, 44000 Nantes (L'adresse vous sera communiquée une semaine avant le stage.)</li>
                   <li>• Samedi 13h30-19h30 / Dimanche 10h00-13h00 puis 14h00-17h00</li>
                   <li>• A partir de 16 ans – aucun niveau requis</li>
                   <li>• Réservation : nk26fr@gmail.com</li>
