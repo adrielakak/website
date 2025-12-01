@@ -208,8 +208,8 @@ function Home() {
                 </p>
                 <h2 className="section-title mt-4 text-white">Face à face</h2>
                 <p className="section-subtitle mt-4 text-white/70">
-                  Vous rêvez d&apos;un suivi personnalisé à distance ? « En face à face » vous propose des cours
-                  personnalisés avec Nathalie Karsenti en distanciel.
+                  Vous rêvez d&apos;un suivi personnalisé à distance ? Nathalie Karsenti vous propose des cours
+                  personnalisés avec en distanciel.
                 </p>
                 <div className="mt-9 space-y-5 text-white/65">
                   <p>
