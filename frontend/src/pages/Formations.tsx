@@ -466,6 +466,30 @@ function Formations() {
         <p className="mx-auto mt-12 max-w-6xl px-4 text-center text-sm text-red-300 sm:text-base lg:max-w-7xl">{error}</p>
       )}
 
+      <div id="reservation-appel" className="mx-auto mt-12 max-w-6xl px-4 sm:px-6 lg:max-w-7xl">
+        <AnimatedContent distance={70} delay={0.1}>
+          <div className="rounded-[32px] border border-white/10 bg-white/[0.04] p-6 shadow-glow-soft backdrop-blur sm:p-8">
+            <div className="max-w-xl">
+              <h2 className="text-2xl font-semibold text-white sm:text-3xl">Discutons de votre projet</h2>
+              <p className="mt-3 text-sm text-white/70 sm:text-base">
+                Vous avez des questions sur les formations ou vous souhaitez un accompagnement personnalisé ? Réservez
+                un appel privé pour en discuter directement avec moi. C&apos;est l&apos;occasion idéale pour évaluer
+                vos besoins et trouver la meilleure approche pour votre parcours.
+              </p>
+            </div>
+
+            {/* Début de widget en ligne Calendly */}
+            <div
+              className="calendly-inline-widget mt-8 overflow-hidden rounded-2xl"
+              data-url="https://calendly.com/nk26fr?background_color=020202&text_color=ffffff&primary_color=c81414"
+              style={{ minWidth: "320px", height: "700px" }}
+            />
+            <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async />
+            {/* Fin de widget en ligne Calendly */}
+          </div>
+        </AnimatedContent>
+      </div>
+
       <ReservationModal
         isOpen={isModalOpen}
         onClose={closeModal}

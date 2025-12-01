@@ -305,9 +305,10 @@ function Home() {
             <div className="relative z-10 space-y-6">
               <h2 className="text-3xl font-semibold md:text-4xl">Contact rapide</h2>
               <p className="max-w-xl text-sm text-white/70">
-                Une question sur le contenu des stages, un besoin spécifique ou une demande de devis pour un groupe ? Ecrivez-nous ou appelez-nous : nous reviendrons vers vous sous 48 heures ouvrées.
+                Une question sur le contenu des stages, un besoin spécifique ou une demande de devis pour un groupe ?
+                Contactez-nous ou réservez directement un créneau pour en discuter.
               </p>
-              <div className="grid gap-6 text-sm md:grid-cols-2">
+              <div className="grid gap-8 text-sm md:grid-cols-3">
                 <div>
                   <p className="text-white/60">Email</p>
                   <a href="mailto:nk26fr@gmail.com" className="text-lg font-semibold text-white hover:underline">
@@ -319,6 +320,15 @@ function Home() {
                   <a href="tel:+33609425911" className="text-lg font-semibold text-white hover:underline">
                     06 09 42 59 11
                   </a>
+                </div>
+                <div>
+                  <p className="text-white/60">Appel visio</p>
+                  <Link
+                    to="/formations#reservation-appel"
+                    className="text-lg font-semibold text-white hover:underline"
+                  >
+                    Réserver un créneau
+                  </Link>
                 </div>
               </div>
             </div>
