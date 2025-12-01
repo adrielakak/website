@@ -232,7 +232,7 @@ function Home() {
                 <div>
                   <h3 className="text-xl font-semibold text-white">Créez votre propre planning</h3>
                   <p className="mt-3 text-sm text-white/60">
-                    Prenez rendez-vous pour 1h, 2h ou optez pour un forfait. C&apos;est vous qui créez votre planning en
+                    Prenez rendez-vous pour 1h, 2h ou 3 heures. C&apos;est vous qui créez votre planning en
                     fonction de vos besoins.
                   </p>
                   <ul className="mt-5 space-y-2 text-sm text-brand-gold">
@@ -243,7 +243,7 @@ function Home() {
                       <span className="font-semibold text-white">2h :</span> 110 EUR
                     </li>
                     <li>
-                      <span className="font-semibold text-white">Forfait 5h :</span> 250 EUR
+                      <span className="font-semibold text-white">3h :</span> 180 EUR
                     </li>
                   </ul>
                 </div>
