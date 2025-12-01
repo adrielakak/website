@@ -217,8 +217,7 @@ function Home() {
                     direction. Analysez vos scènes, recevez des conseils et gagnez en confiance.
                   </p>
                   <p>
-                    Pour le théâtre, le cinéma ou le doublage, vous pouvez envoyer votre scène à travailler en utilisant
-                    notre{" "}
+                    Pour toute interrogation, n&apos;hésitez pas à nous contacter via notre{" "}
                     <Link to="/contact" className="font-semibold text-brand-gold hover:underline">
                       formulaire de contact
                     </Link>
