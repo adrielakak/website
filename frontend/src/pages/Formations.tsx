@@ -329,6 +329,17 @@ function Formations() {
   }, [availability, stageIntensif]);
   const stageSessionsEntries = useMemo(() => Object.entries(stageSessionsByMonth), [stageSessionsByMonth]);
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://assets.calendly.com/assets/external/widget.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   const openModal = (formation: Formation) => {
     setSelectedFormation(formation);
     setIsModalOpen(true);
@@ -484,7 +495,6 @@ function Formations() {
               data-url="https://calendly.com/nk26fr?background_color=020202&text_color=ffffff&primary_color=c81414"
               style={{ minWidth: "320px", height: "700px" }}
             />
-            <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async />
             {/* Fin de widget en ligne Calendly */}
           </div>
         </AnimatedContent>
