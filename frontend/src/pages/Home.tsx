@@ -246,9 +246,6 @@ function Home() {
                       <span className="font-semibold text-white">Forfait 5h :</span> 250 EUR
                     </li>
                   </ul>
-                  <p className="mt-3 text-xs text-white/50">
-                    (Le forfait 5h est à utiliser sur une période de 2 mois maximum)
-                  </p>
                 </div>
                 <div className="pt-4">
                   <Link to="/formations#reservation-appel" className="btn-primary w-full">

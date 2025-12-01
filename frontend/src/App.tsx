@@ -14,21 +14,26 @@ import Vidoleo from "./pages/Vidoleo";
 import Legal from "./pages/Legal";
 import ThankYou from "./pages/ThankYou";
 
-const ScrollToTop = () => {
-  const { pathname } = useLocation();
+function App() {
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [pathname]);
+    if (hash) {
+      const id = hash.substring(1);
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 200);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
 
-  return null;
-};
-
-function App() {
   return (
     <div className="flex min-h-screen flex-col bg-white text-gray-900">
       <Navbar />
-      <ScrollToTop />
       <main className="flex-1 pt-20">
         <Routes>
           <Route path="/" element={<Home />} />
