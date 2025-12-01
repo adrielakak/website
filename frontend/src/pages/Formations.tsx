@@ -479,10 +479,10 @@ function Formations() {
 
       <div id="reservation-appel" className="mx-auto mt-12 max-w-6xl px-4 sm:px-6 lg:max-w-7xl">
         <AnimatedContent distance={70} delay={0.1}>
-          <div className="rounded-[32px] border border-white/10 bg-white/[0.04] p-6 shadow-glow-soft backdrop-blur sm:p-8">
+          <div className="rounded-[32px] border border-gray-200 bg-gray-100 p-6 shadow-lg sm:p-8">
             <div className="max-w-xl">
-              <h2 className="text-2xl font-semibold text-white sm:text-3xl">Discutons de votre projet</h2>
-              <p className="mt-3 text-sm text-white/70 sm:text-base">
+              <h2 className="text-2xl font-semibold text-gray-900 sm:text-3xl">Discutons de votre projet</h2>
+              <p className="mt-3 text-sm text-gray-600 sm:text-base">
                 Vous avez des questions sur les formations ou vous souhaitez un accompagnement personnalisé ? Réservez
                 un appel privé pour en discuter directement avec moi. C&apos;est l&apos;occasion idéale pour évaluer
                 vos besoins et trouver la meilleure approche pour votre parcours.
@@ -491,8 +491,8 @@ function Formations() {
 
             {/* Début de widget en ligne Calendly */}
             <div
-              className="calendly-inline-widget mt-8 overflow-hidden rounded-2xl"
-              data-url="https://calendly.com/nk26fr?background_color=020202&text_color=ffffff&primary_color=c81414"
+              className="calendly-inline-widget mt-8"
+              data-url="https://calendly.com/nk26fr?hide_cookie_banner=1"
               style={{ minWidth: "320px", height: "700px" }}
             />
             {/* Fin de widget en ligne Calendly */}

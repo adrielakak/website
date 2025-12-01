@@ -199,6 +199,69 @@ function Home() {
       </section>
 
       <section className="bg-[#0d1324]">
+        <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 lg:max-w-7xl">
+          <div className="grid gap-16 md:grid-cols-2 md:items-center">
+            <AnimatedContent distance={100} delay={0.05}>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.5em] text-brand-gold/80">
+                  Coaching individuel
+                </p>
+                <h2 className="section-title mt-4 text-white">Face à face</h2>
+                <p className="section-subtitle mt-4 text-white/70">
+                  Vous rêvez d&apos;un suivi personnalisé à distance ? « En face à face » vous propose des cours
+                  personnalisés avec Nathalie Karsenti en distanciel.
+                </p>
+                <div className="mt-9 space-y-5 text-white/65">
+                  <p>
+                    Bénéficiez d&apos;un cours privé avec Nathalie pour progresser rapidement et ne plus avancer sans
+                    direction. Analysez vos scènes, recevez des conseils et gagnez en confiance.
+                  </p>
+                  <p>
+                    Théâtre, cinéma, doublage... Envoyez votre scène à travailler sur :{" "}
+                    <a href="mailto:NK26FR@GMAIL.COM" className="font-semibold text-brand-gold hover:underline">
+                      NK26FR@GMAIL.COM
+                    </a>
+                    .
+                  </p>
+                </div>
+              </div>
+            </AnimatedContent>
+
+            <AnimatedContent distance={80} direction="horizontal" delay={0.1}>
+              <div className="card-lux space-y-8 bg-white/[0.04] p-8">
+                <div>
+                  <h3 className="text-xl font-semibold text-white">Créez votre propre planning</h3>
+                  <p className="mt-3 text-sm text-white/60">
+                    Prenez rendez-vous pour 1h, 2h ou optez pour un forfait. C&apos;est vous qui créez votre planning en
+                    fonction de vos besoins.
+                  </p>
+                  <ul className="mt-5 space-y-2 text-sm text-brand-gold">
+                    <li>
+                      <span className="font-semibold text-white">1h :</span> 60 EUR
+                    </li>
+                    <li>
+                      <span className="font-semibold text-white">2h :</span> 110 EUR
+                    </li>
+                    <li>
+                      <span className="font-semibold text-white">Forfait 5h :</span> 250 EUR
+                    </li>
+                  </ul>
+                  <p className="mt-3 text-xs text-white/50">
+                    (Le forfait 5h est à utiliser sur une période de 2 mois maximum)
+                  </p>
+                </div>
+                <div className="pt-4">
+                  <Link to="/formations#reservation-appel" className="btn-primary w-full">
+                    Prendre rendez-vous
+                  </Link>
+                </div>
+              </div>
+            </AnimatedContent>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#0d1324]">
         <div className="mx-auto max-w-6xl px-4 py-24 space-y-16 sm:px-6 lg:max-w-7xl">
           <AnimatedContent distance={80}>
             <div>
