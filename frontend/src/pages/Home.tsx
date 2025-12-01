@@ -217,10 +217,11 @@ function Home() {
                     direction. Analysez vos scènes, recevez des conseils et gagnez en confiance.
                   </p>
                   <p>
-                    Théâtre, cinéma, doublage... Envoyez votre scène à travailler sur :{" "}
-                    <a href="mailto:NK26FR@GMAIL.COM" className="font-semibold text-brand-gold hover:underline">
-                      NK26FR@GMAIL.COM
-                    </a>
+                    Pour le théâtre, le cinéma ou le doublage, vous pouvez envoyer votre scène à travailler en utilisant
+                    notre{" "}
+                    <Link to="/contact" className="font-semibold text-brand-gold hover:underline">
+                      formulaire de contact
+                    </Link>
                     .
                   </p>
                 </div>
